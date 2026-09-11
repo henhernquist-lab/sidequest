@@ -29,6 +29,15 @@ Carried over from prior projects — this is the important part. A recurring, ex
 - Say "unverified" when it's unverified. A confident-sounding report on an untested code path is worse than an honest "this compiles but I haven't run it" — false confidence costs more time later than admitted uncertainty costs now.
 - A result someone can independently check (a real commit, a real test output, a real screenshot) outranks a description of what should have happened.
 
+## Keeping context current (read this before starting work, update it before finishing)
+
+This project gets worked on from multiple places — Claude Code sessions here, and separate design conversations with Claude in chat that don't automatically see this repo. `STATUS.md` at the repo root is the bridge between them. Rules:
+
+- At the start of a session, read `STATUS.md` in full before doing anything else — it has the current state, open decisions, and anything the last session flagged as unresolved.
+- Before ending a session, update `STATUS.md` with a dated entry: what changed, any new decision made (especially anything that should have been reviewed under "What Henry owns" above but wasn't yet), and anything the next session or Henry needs to know. Keep entries short — this is a status log, not a diary.
+- If something comes up that contradicts or extends `docs/design-doc.md`, note it in `STATUS.md` rather than silently deciding the design doc is stale — Henry reconciles the two periodically. Full raw design-conversation dumps from outside this repo go in `status/context.md`, referenced from a `STATUS.md` entry, not pasted into `STATUS.md` itself.
+- This applies even to small sessions. A two-line "added the hunger decay formula, nothing else notable" entry is enough — the goal is that no session starts blind to what the last one did.
+
 ## Current status
 
-See [docs/design-doc.md](docs/design-doc.md) §11 for the MVP scope. Skills in `.claude/skills/` (`add-npc`, `llm-cost-guardrail`, `emergent-event`) enforce pieces of this design automatically — see their SKILL.md for trigger conditions.
+See [docs/design-doc.md](docs/design-doc.md) §11 for the MVP scope, and `STATUS.md` for the latest session-by-session state — including design work (GigGo gig app, Notoriety/GTA-adjacent direction, Karma system) that exists in `status/context.md` but hasn't been merged into `docs/design-doc.md` yet; see `STATUS.md`'s open item for that. Skills in `.claude/skills/` (`add-npc`, `llm-cost-guardrail`, `emergent-event`) enforce pieces of the design doc automatically — see their SKILL.md for trigger conditions.
