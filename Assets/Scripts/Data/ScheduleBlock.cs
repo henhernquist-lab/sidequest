@@ -1,4 +1,5 @@
 using System;
+using SideQuest.Simulation;
 
 namespace SideQuest.Data
 {
@@ -6,7 +7,8 @@ namespace SideQuest.Data
     {
         public TimeSpan Start;
         public TimeSpan End;
-        public string Activity;
+        public string Activity; // Flavor/display only; never used for dispatch.
+        public NpcAction ActionType;
         public string LocationId;
     }
 }

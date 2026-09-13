@@ -1,3 +1,4 @@
+using SideQuest.Simulation;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -48,8 +49,8 @@ namespace SideQuest.Data.Verification
                 Money = 540,
                 Schedule = new List<ScheduleBlock>
                 {
-                    new ScheduleBlock { Start = TimeSpan.FromHours(7), End = TimeSpan.FromHours(15), Activity = "Work", LocationId = "loc_corner_diner" },
-                    new ScheduleBlock { Start = TimeSpan.FromHours(15), End = TimeSpan.FromHours(22), Activity = "Leisure", LocationId = "loc_apartment_complex_3b" }
+                    new ScheduleBlock { Start = TimeSpan.FromHours(7), End = TimeSpan.FromHours(15), Activity = "Work", ActionType = NpcAction.WorkShift, LocationId = "loc_corner_diner" },
+                    new ScheduleBlock { Start = TimeSpan.FromHours(15), End = TimeSpan.FromHours(22), Activity = "Leisure", ActionType = NpcAction.Socialize, LocationId = "loc_apartment_complex_3b" }
                 },
                 Goals = new Goals
                 {

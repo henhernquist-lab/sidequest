@@ -113,3 +113,6 @@ InitTestScene*.unity*
 # above only anchors /Obj/ at repo root, which doesn't cover this.
 bin/
 obj/
+
+# Checked-in headless verification runner (not a Unity-generated project).
+!/tools/Verification/Verification.csproj

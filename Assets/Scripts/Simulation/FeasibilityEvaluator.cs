@@ -90,7 +90,7 @@ namespace SideQuest.Simulation
         private static string ScheduledVenueFor(NPC npc, NpcAction action, TimeSpan tod)
         {
             var block = ScheduleService.BlockAt(npc, tod);
-            return block != null && ScheduleService.TryMapActivity(block.Activity, out var scheduled) && scheduled == action
+            return block != null && block.ActionType == action
                 ? block.LocationId
                 : null;
         }

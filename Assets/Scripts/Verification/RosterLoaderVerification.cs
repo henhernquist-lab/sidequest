@@ -32,6 +32,15 @@ namespace SideQuest.Loading.Verification
             ok &= Section(log, "R4. Optional player section", l => VerifyPlayerSection(l, locations));
             ReportScheduleVocabulary(log, json, rosterPath, locations);
             ok &= Section(log, "R6. One full day for Rosa, from her loaded data", l => VerifyRosaDay(l, json, rosterPath, locations));
+            ok &= Section(log, "R7. Typed schedules, overlap and mutuality controls", l => VerifyScheduleValidation(l, json, locations));
+            foreach (string id in new[] { "npc_ana_diner", "npc_sal_mechanic", "npc_frank_cop" })
+            {
+                ok &= Section(log, "R8. Loaded work day: " + id, l =>
+                {
+                    NPC npc = RosterLoader.Load(json, rosterPath, locations).NpcsById[id];
+                    return SimulationVerification.RunDayTimeline(l, npc, GameTime.FromDateTime(npc.LastSimulatedAt), 42, locations);
+                });
+            }
             return ok;
         }
 
@@ -120,6 +129,14 @@ namespace SideQuest.Loading.Verification
                 ? "every loaded NPC has every reference field populated"
                 : "missing: " + string.Join(", ", incomplete));
 
+            bool actionsMatch = rawNpcs.OfType<JObject>().All(raw =>
+            {
+                NPC npc = roster.NpcsById[(string)raw["id"]];
+                return npc.Schedule.Select((block, i) => block.ActionType.ToString() == (string)raw["schedule"][i]["actionType"]
+                    && block.Activity == (string)raw["schedule"][i]["activity"]).All(match => match);
+            });
+            ok &= Expect(log, actionsMatch, "all ActionType values and flavor labels match raw JSON exactly");
+
             var sizeMismatches = new List<string>();
             foreach (JObject raw in rawNpcs)
             {
@@ -161,7 +178,8 @@ namespace SideQuest.Loading.Verification
 
             ok &= ExpectLoadFailure(log, "relationship to a nonexistent NPC: Rosa -> 'npc_priya_flourist'",
                 Corrupt(json, badRelationship), locations,
-                (RosaPath + ".relationships.npc_priya_flourist", "'npc_priya_flourist' is not an NPC id"));
+                (RosaPath + ".relationships.npc_priya_flourist", "'npc_priya_flourist' is not an NPC id"),
+                ("npcs[7](npc_priya_florist).relationships.npc_rosa_shop.type", "non-mutual Family link"));
 
             log.Add("  (a silent default for the next one would give Rosa Diligence 0.0, which changes when her §22 storyline fires)");
             ok &= ExpectLoadFailure(log, "missing required field: Rosa's personality.diligence removed",
@@ -176,6 +194,7 @@ namespace SideQuest.Loading.Verification
                 Corrupt(Corrupt(Corrupt(json, badLocation), badRelationship), missingField), locations,
                 (RosaPath + ".job.workplaceId", "unknown location id 'loc_genral_store'"),
                 (RosaPath + ".relationships.npc_priya_flourist", "'npc_priya_flourist' is not an NPC id"),
+                ("npcs[7](npc_priya_florist).relationships.npc_rosa_shop.type", "non-mutual Family link"),
                 (RosaPath + ".personality.diligence", "missing required field"));
             return ok;
         }
@@ -255,22 +274,18 @@ namespace SideQuest.Loading.Verification
         private static void ReportScheduleVocabulary(List<string> log, string json, string rosterPath, LocationRegistry locations)
         {
             log.Add("");
-            log.Add("=== R5. Roster schedule activities vs. the utility AI's activity table (report, not pass/fail) ===");
+            log.Add("=== R5. Roster schedule ActionType values (report, not pass/fail) ===");
             Roster roster = RosterLoader.Load(json, rosterPath, locations);
 
             var blocks = roster.Npcs.SelectMany(n => n.Schedule).ToList();
-            var mapped = blocks.Where(b => ScheduleService.TryMapActivity(b.Activity, out _)).ToList();
-            log.Add($"  {mapped.Count} of {blocks.Count} schedule blocks across {roster.Npcs.Count} NPCs map to an NpcAction.");
-            log.Add($"  Labels that map: {string.Join(", ", mapped.Select(b => b.Activity).Distinct())}");
+            log.Add($"  {blocks.Count} schedule blocks across {roster.Npcs.Count} NPCs have validated ActionType values.");
             log.Add("  Blocks at each employed NPC's own workplace, as the utility AI sees them:");
 
             foreach (var npc in roster.Npcs.Where(n => n.Job != null))
             {
                 foreach (var block in npc.Schedule.Where(b => b.LocationId == npc.Job.WorkplaceId))
                 {
-                    string seenAs = ScheduleService.TryMapActivity(block.Activity, out NpcAction action)
-                        ? action.ToString()
-                        : "UNMAPPED (no WorkShift baseline, and WorkShift is infeasible)";
+                    string seenAs = block.ActionType.ToString();
                     log.Add($"    {npc.Id,-18} {block.Start:hh\\:mm}-{block.End:hh\\:mm}  \"{block.Activity}\" -> {seenAs}");
                 }
             }
@@ -287,10 +302,63 @@ namespace SideQuest.Loading.Verification
             log.Add("  Her schedule, and what the utility AI makes of each block:");
             foreach (var block in rosa.Schedule)
             {
-                string seenAs = ScheduleService.TryMapActivity(block.Activity, out NpcAction action) ? action.ToString() : "unmapped";
+                string seenAs = block.ActionType.ToString();
                 log.Add($"    {block.Start:hh\\:mm}-{block.End:hh\\:mm}  {block.LocationId,-22} \"{block.Activity}\" -> {seenAs}");
             }
             return SimulationVerification.RunDayTimeline(log, rosa, start, 42, locations);
+        }
+
+        private static bool VerifyScheduleValidation(List<string> log, string json, LocationRegistry locations)
+        {
+            JObject Copy() => JObject.Parse(json);
+            string Serialize(JObject root) => root.ToString();
+            var clean = RosterLoader.Load(json, "control.json", locations);
+            bool ok = Expect(log, clean.Npcs.Sum(n => n.Schedule.Count) == 134, "control: all 134 typed blocks load, including touching and midnight-wrapping blocks");
+            const string actionPath = "npcs[0](npc_ana_diner).schedule[0].actionType";
+            foreach (var value in new JToken[] { new JValue("Bogus"), new JValue("0"), new JValue(0), new JValue("eat"), new JValue("Eat, Sleep"), JValue.CreateNull() })
+            {
+                var bad = Copy(); bad["npcs"][0]["schedule"][0]["actionType"] = value;
+                ok &= ExpectLoadFailure(log, "invalid actionType " + value.ToString(), Serialize(bad), locations,
+                    (actionPath, "must be"));
+            }
+            var missing = Copy(); ((JObject)missing["npcs"][0]["schedule"][0]).Remove("actionType");
+            ok &= ExpectLoadFailure(log, "missing actionType", Serialize(missing), locations, (actionPath, "missing required field"));
+
+            var combined = Copy();
+            combined["npcs"][0]["schedule"][0]["actionType"] = "Bogus";
+            combined["npcs"][0]["schedule"][1]["start"] = "07:30";
+            combined["npcs"][7]["relationships"]["npc_rosa_shop"]["type"] = "Friend";
+            ok &= ExpectLoadFailure(log, "bogus ActionType + overlap + non-mutual Family", Serialize(combined), locations,
+                (actionPath, "must be"),
+                ("npcs[0](npc_ana_diner).schedule[1]", "overlaps npcs[0](npc_ana_diner).schedule[0]"),
+                (RosaPath + ".relationships.npc_priya_florist.type", "non-mutual Family link"));
+
+            foreach (string start in new[] { "06:50", "23:30" })
+            {
+                var bad = Copy(); bad["npcs"][0]["schedule"][0]["start"] = start;
+                ok &= ExpectLoadFailure(log, "overlap across midnight: " + start, Serialize(bad), locations,
+                    ("npcs[0](npc_ana_diner).schedule[7]", "overlaps npcs[0](npc_ana_diner).schedule[0]"));
+            }
+            foreach (string type in new[] { "Family", "Rival", "Romantic" })
+            {
+                var bad = Copy();
+                var npcs = (JArray)bad["npcs"];
+                JObject owner = npcs.OfType<JObject>().First(n => ((JObject)n["relationships"]).Properties().Any(r => (string)r.Value["type"] == type));
+                JProperty link = ((JObject)owner["relationships"]).Properties().First(r => (string)r.Value["type"] == type);
+                JObject target = npcs.OfType<JObject>().Single(n => (string)n["id"] == link.Name);
+                ((JObject)target["relationships"]).Remove((string)owner["id"]);
+                string path = $"npcs[{npcs.IndexOf(owner)}]({owner["id"]}).relationships.{link.Name}.type";
+                ok &= ExpectLoadFailure(log, "missing reverse " + type, Serialize(bad), locations, (path, "non-mutual " + type + " link"));
+            }
+            // Negative work control: preserve narrative work labels, explicitly disable mechanical shifts.
+            NPC rosa = RosterLoader.Load(json, "control.json", locations).NpcsById["npc_rosa_shop"];
+            foreach (var block in rosa.Schedule.Where(b => b.ActionType == NpcAction.WorkShift)) block.ActionType = NpcAction.Idle;
+            var controlLog = new List<string>();
+            bool controlPassed = SimulationVerification.RunDayTimeline(controlLog, rosa, GameTime.FromDateTime(rosa.LastSimulatedAt), 42, locations);
+            string workLine = controlLog.Single(l => l.Contains("employed as"));
+            log.Add("  Negative work control: " + workLine);
+            ok &= Expect(log, !controlPassed && workLine.Contains("worked 0 of 0"), "same work-hours check fails with shifts disabled despite unchanged flavor labels");
+            return ok;
         }
 
         private static bool ExpectLoadFailure(List<string> log, string title, string json, LocationRegistry locations,

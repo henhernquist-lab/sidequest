@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using SideQuest.Core;
 using SideQuest.Data;
 using SideQuest.World;
+using SideQuest.Simulation;
 
 namespace SideQuest.Loading
 {
@@ -26,7 +27,7 @@ namespace SideQuest.Loading
         private static readonly string[] PersonalityFields = { "ambition", "extroversion", "honesty", "riskTolerance", "warmth", "diligence" };
         private static readonly string[] NeedsFields = { "hunger", "energy", "social", "hygiene" };
         private static readonly string[] JobFields = { "title", "workplaceId", "income", "performance" };
-        private static readonly string[] ScheduleBlockFields = { "start", "end", "activity", "locationId" };
+        private static readonly string[] ScheduleBlockFields = { "start", "end", "activity", "actionType", "locationId" };
         private static readonly string[] GoalsFields = { "shortTerm", "longTerm" };
         private static readonly string[] RelationshipFields = { "affinity", "trust", "familiarity", "lastInteractionAt", "type" };
         private static readonly string[] MemoryFactFields = { "timestamp", "eventType", "description", "importanceScore", "involvedNpcIds" };
@@ -163,6 +164,33 @@ namespace SideQuest.Loading
                 foreach (var entry in read)
                     CheckNpcReferences(entry.Npc, entry.Path, entry.Source, firstPathById);
 
+                // Only structural mutual types are symmetric; feelings (affinity/trust) remain directional.
+                var unique = read.Where(e => e.Npc.Id != null)
+                    .GroupBy(e => e.Npc.Id).Where(g => g.Count() == 1).ToDictionary(g => g.Key, g => g.Single());
+                var reportedPairs = new HashSet<(string, string)>();
+                foreach (var entry in unique.Values)
+                {
+                    if (!(entry.Source["relationships"] is JObject relationships)) continue;
+                    foreach (var link in relationships.Properties())
+                    {
+                        string type = (link.Value as JObject)?["type"]?.Type == JTokenType.String
+                            ? (string)link.Value["type"] : null;
+                        if (type != "Family" && type != "Rival" && type != "Romantic") continue;
+                        if (link.Name == entry.Npc.Id || !unique.TryGetValue(link.Name, out var target)) continue;
+                        var reverse = (target.Source["relationships"] as JObject)?[entry.Npc.Id] as JObject;
+                        var reverseType = reverse?["type"];
+                        // A malformed reverse link has its own field/type error already.
+                        if (reverse != null && (reverseType?.Type != JTokenType.String ||
+                            !Enum.GetNames(typeof(RelationshipType)).Contains((string)reverseType))) continue;
+                        if (reverseType != null && (string)reverseType == type) continue;
+                        var pair = string.CompareOrdinal(entry.Npc.Id, link.Name) < 0
+                            ? (entry.Npc.Id, link.Name) : (link.Name, entry.Npc.Id);
+                        if (!reportedPairs.Add(pair)) continue;
+                        Error($"{entry.Path}.relationships.{link.Name}.type", link.Value["type"],
+                            $"non-mutual {type} link: '{link.Name}' must list '{entry.Npc.Id}' as {type}; reverse type is {(reverseType == null ? "missing" : (string)reverseType)}");
+                    }
+                }
+
                 return read.Select(entry => entry.Npc).ToList();
             }
 
@@ -261,6 +289,7 @@ namespace SideQuest.Loading
                 if (array == null) return null;
 
                 var blocks = new List<ScheduleBlock>(array.Count);
+                var intervals = new List<(TimeSpan Start, TimeSpan End, int Index)>();
                 for (int i = 0; i < array.Count; i++)
                 {
                     string bp = $"{p}[{i}]";
@@ -277,11 +306,33 @@ namespace SideQuest.Loading
                     if (start.HasValue && end.HasValue && start.Value == end.Value)
                         Error($"{bp}.end", obj["end"], $"equals start ({start.Value:hh\\:mm}); a block can't start and end at the same time");
 
+                    // Compare valid half-open intervals on a repeating 24-hour clock. Touching is legal.
+                    // Invalid times already have precise errors; do not compare their default placeholders.
+                    if (start.HasValue && end.HasValue && start.Value != end.Value)
+                    {
+                        double a = start.Value.TotalMinutes;
+                        double b = end.Value.TotalMinutes;
+                        if (b < a) b += 1440;
+                        foreach (var previous in intervals)
+                        {
+                            double c = previous.Start.TotalMinutes;
+                            double d = previous.End.TotalMinutes;
+                            if (d < c) d += 1440;
+                            bool overlaps = false;
+                            for (int offset = -1440; offset <= 1440; offset += 1440)
+                                overlaps |= a < d + offset && c + offset < b;
+                            if (overlaps)
+                                Error(bp, obj, $"schedule block overlaps {p}[{previous.Index}] (an NPC cannot be scheduled twice at once)");
+                        }
+                        intervals.Add((start.Value, end.Value, i));
+                    }
+
                     blocks.Add(new ScheduleBlock
                     {
                         Start = start ?? default,
                         End = end ?? default,
                         Activity = ReadString(obj, bp, "activity"),
+                        ActionType = ReadEnum<NpcAction>(obj, bp, "actionType"),
                         LocationId = ReadLocationId(obj, bp, "locationId"),
                     });
                 }

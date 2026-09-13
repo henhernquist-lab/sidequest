@@ -1,0 +1,10 @@
+using System;
+using System.Collections.Generic;
+using SideQuest.Simulation.Verification;
+using SideQuest.Loading.Verification;
+var log = new List<string>();
+bool ok = SimulationVerification.RunAll(log);
+ok &= RosterLoaderVerification.RunAll(log, args.Length > 0 ? args[0] : "Assets/Data/npc_roster.json");
+foreach (var line in log) Console.WriteLine(line);
+Console.WriteLine(ok ? "OVERALL: PASS" : "OVERALL: FAIL");
+return ok ? 0 : 1;

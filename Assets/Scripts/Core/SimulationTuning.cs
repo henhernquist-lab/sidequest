@@ -35,6 +35,15 @@ namespace SideQuest.Core
         // A need-driven action overrides the schedule only by out-scoring this.
         public const float ScheduleBaselineUrgency = 0.35f;
 
+        // Paid shifts are stronger commitments than optional daily activities.
+        // Diligence still scales this, and urgent needs can still outweigh work.
+        public const float WorkShiftBaselineUrgency = 0.6f;
+
+        // Even low-diligence employees have a paid commitment; diligence strengthens it.
+        // Work scores range 0.45..0.60 before noise, below Hunger-10 urgency (~0.729).
+        public const float WorkDiligenceWeightBase = 0.75f;
+        public const float WorkDiligenceWeightSpan = 0.25f;
+
         // Goals aren't modeled mechanically yet, so PursueGoal gets a flat drive that
         // Ambition then scales. Kept above IdleUrgency so a goal beats doing nothing.
         public const float GoalDriveUrgency = 0.12f;

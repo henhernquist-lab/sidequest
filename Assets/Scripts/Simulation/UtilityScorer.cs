@@ -7,7 +7,7 @@ namespace SideQuest.Simulation
 {
     // score = urgency x personality weight x feasibility x noise.
     // Following the schedule is not a separate system: the scheduled action just gets
-    // ScheduleBaselineUrgency as a floor, and needs override it only by out-scoring it.
+    // an action-specific urgency floor, and needs override it only by out-scoring it.
     public sealed class UtilityScorer
     {
         private static readonly NpcAction[] AllActions = (NpcAction[])Enum.GetValues(typeof(NpcAction));
@@ -63,14 +63,17 @@ namespace SideQuest.Simulation
                 NpcAction.Idle => SimulationTuning.IdleUrgency,
                 _ => 0f,
             };
-            float scheduleUrgency = isScheduled ? SimulationTuning.ScheduleBaselineUrgency : 0f;
+            float scheduleUrgency = !isScheduled ? 0f
+                : action == NpcAction.WorkShift ? SimulationTuning.WorkShiftBaselineUrgency
+                : SimulationTuning.ScheduleBaselineUrgency;
             return Math.Max(needUrgency, scheduleUrgency);
         }
 
         public static float PersonalityWeight(Personality personality, NpcAction action) => action switch
         {
             NpcAction.Socialize => TraitWeight(personality.Extroversion),
-            NpcAction.WorkShift => TraitWeight(personality.Diligence),
+            NpcAction.WorkShift => SimulationTuning.WorkDiligenceWeightBase
+                + SimulationTuning.WorkDiligenceWeightSpan * Math.Clamp(personality.Diligence, 0f, 1f),
             NpcAction.PursueGoal => TraitWeight(personality.Ambition),
             _ => SimulationTuning.NeutralPersonalityWeight,
         };

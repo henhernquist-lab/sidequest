@@ -28,6 +28,7 @@ The player is **not** in this file (`PlayerCharacter` is defined elsewhere, §7)
 | `inventoryItemIds` | `item_*` strings are **forward-declared** — no item registry exists yet. Treat as opaque stable ids. |
 | `money` | Starting value in whatever unit the economy settles on; positive integers. |
 | `schedule` | Times `HH:MM` 24-hour local. `end < start` means the block wraps past midnight. Every NPC has exactly one primary (≥5h) sleep block; blocks must not overlap. |
+| schedule `actionType`, `activity` | Required exact enum name: `Eat`, `Sleep`, `Socialize`, `Bathe`, `WorkShift`, `PursueGoal`, `Idle`. Only `actionType` drives dispatch; `activity` is display/flavor text. |
 | `goals` | `shortTerm` / `longTerm` string lists; flavor + future utility-AI hooks, not yet mechanical. |
 | `relationships` | Keyed by other NPC's `id` (mirrors §7's `Dictionary<string, Relationship>`). ≥2 entries per NPC. Types are the §7 enum. `Rival`/`Family`/`Romantic` links are reciprocal (both sides list each other with the same type); one-sided *feelings* are expressed through asymmetric `affinity` values, not through asymmetric `type`. |
 | `memoryStream` | 1–2 seeded `MemoryFact`s per NPC as starting history. Timestamps ISO-8601 UTC (`Z`). |
@@ -43,14 +44,17 @@ as asymmetric affinity.
 
 ### Validation status
 
-Validated by a throwaway script (not committed): exact field-set match against §7 per
-NPC, all range checks, all id/location references resolve within the file, schedule
-overlap + single-sleep-block checks, reciprocity of Rival/Family/Romantic links,
-§21 job counts, §22 seed presence. Control test: 6 deliberately injected bugs were all
-caught by the same checks — see the 2026-09-13 roster entry in `STATUS.md`.
+The permanent roster loader rejects unknown/missing fields, invalid enum names, ranges,
+unknown ids/locations, overlapping schedules (including midnight wraps), and non-mutual
+Family/Rival/Romantic types. The historical content audit also checked primary sleep
+blocks and job counts; those two content rules are not loader requirements.
 
-If you hand-edit this file: keep the field set exact (extra fields are errors, not
-tolerated extras), keep every referenced id resolvable, and re-run whatever validation
-exists at that time. When a real loader gets written it should **fail loudly** on
-unknown fields, unknown locations, and unknown ids — a silently-defaulted NPC is
-design-doc §15 Implementation Risk #5 (see the `add-npc` skill).
+Run the headless verification suite from the repository root:
+
+```sh
+dotnet run --project tools/Verification
+```
+
+The suite includes corrupted-roster controls and loaded day timelines. See `STATUS.md`
+for current results and any failing behavioral guardrails. Unity wiring and play behavior
+require verification on the Editor machine.

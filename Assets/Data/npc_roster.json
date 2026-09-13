@@ -31,14 +31,14 @@
       "inventoryItemIds": [ "item_phone", "item_diner_apron", "item_sketchbook" ],
       "money": 340,
       "schedule": [
-        { "start": "07:00", "end": "07:40", "activity": "Get ready", "locationId": "loc_apartment_complex" },
-        { "start": "07:40", "end": "08:00", "activity": "Walk to work", "locationId": "loc_town_square" },
-        { "start": "08:00", "end": "15:00", "activity": "Diner morning shift", "locationId": "loc_corner_diner" },
-        { "start": "15:00", "end": "15:30", "activity": "Lunch break", "locationId": "loc_corner_diner" },
-        { "start": "15:30", "end": "17:00", "activity": "Sketch in the park", "locationId": "loc_town_square" },
-        { "start": "17:00", "end": "19:30", "activity": "Evening with Jin", "locationId": "loc_town_square" },
-        { "start": "19:30", "end": "22:00", "activity": "Home, wind down", "locationId": "loc_apartment_complex" },
-        { "start": "22:00", "end": "07:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+        { "start": "07:00", "end": "07:40", "activity": "Get ready", "actionType": "Bathe", "locationId": "loc_apartment_complex" },
+        { "start": "07:40", "end": "08:00", "activity": "Walk to work", "actionType": "Idle", "locationId": "loc_town_square" },
+        { "start": "08:00", "end": "15:00", "activity": "Diner morning shift", "actionType": "WorkShift", "locationId": "loc_corner_diner" },
+        { "start": "15:00", "end": "15:30", "activity": "Lunch break", "actionType": "Eat", "locationId": "loc_corner_diner" },
+        { "start": "15:30", "end": "17:00", "activity": "Sketch in the park", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "17:00", "end": "19:30", "activity": "Evening with Jin", "actionType": "Socialize", "locationId": "loc_town_square" },
+        { "start": "19:30", "end": "22:00", "activity": "Home, wind down", "actionType": "Idle", "locationId": "loc_apartment_complex" },
+        { "start": "22:00", "end": "07:00", "activity": "Sleep", "actionType": "Sleep", "locationId": "loc_apartment_complex" }
       ],
       "goals": {
         "shortTerm": [ "Save enough for a proper sketchbook run", "Keep the regulars tipping" ],
@@ -94,13 +94,13 @@
       "inventoryItemIds": [ "item_phone", "item_store_keys", "item_ledger_book" ],
       "money": 1250,
       "schedule": [
-        { "start": "08:30", "end": "09:00", "activity": "Open the store (late)", "locationId": "loc_general_store" },
-        { "start": "09:00", "end": "12:00", "activity": "Counter shift", "locationId": "loc_general_store" },
-        { "start": "12:00", "end": "13:00", "activity": "Long lunch / errands", "locationId": "loc_corner_diner" },
-        { "start": "13:00", "end": "17:00", "activity": "Counter shift", "locationId": "loc_general_store" },
-        { "start": "17:00", "end": "18:00", "activity": "Coffee with cousin Priya", "locationId": "loc_corner_diner" },
-        { "start": "18:00", "end": "20:00", "activity": "Home TV and ledger", "locationId": "loc_apartment_complex" },
-        { "start": "20:00", "end": "08:30", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+        { "start": "08:30", "end": "09:00", "activity": "Open the store (late)", "actionType": "WorkShift", "locationId": "loc_general_store" },
+        { "start": "09:00", "end": "12:00", "activity": "Counter shift", "actionType": "WorkShift", "locationId": "loc_general_store" },
+        { "start": "12:00", "end": "13:00", "activity": "Long lunch / errands", "actionType": "Eat", "locationId": "loc_corner_diner" },
+        { "start": "13:00", "end": "17:00", "activity": "Counter shift", "actionType": "WorkShift", "locationId": "loc_general_store" },
+        { "start": "17:00", "end": "18:00", "activity": "Coffee with cousin Priya", "actionType": "Socialize", "locationId": "loc_corner_diner" },
+        { "start": "18:00", "end": "20:00", "activity": "Home TV and ledger", "actionType": "Idle", "locationId": "loc_apartment_complex" },
+        { "start": "20:00", "end": "08:30", "activity": "Sleep", "actionType": "Sleep", "locationId": "loc_apartment_complex" }
       ],
       "goals": {
         "shortTerm": [ "Convince Dante to settle about the seed money", "Keep the shelves stocked without doing the ordering herself" ],
@@ -156,14 +156,14 @@
       "inventoryItemIds": [ "item_phone", "item_toolkit", "item_reading_glasses" ],
       "money": 2100,
       "schedule": [
-        { "start": "06:30", "end": "07:00", "activity": "Coffee and paper", "locationId": "loc_apartment_complex" },
-        { "start": "07:00", "end": "07:30", "activity": "Walk to the shop", "locationId": "loc_town_square" },
-        { "start": "07:30", "end": "12:00", "activity": "Morning repairs", "locationId": "loc_auto_shop" },
-        { "start": "12:00", "end": "12:45", "activity": "Lunch", "locationId": "loc_corner_diner" },
-        { "start": "12:45", "end": "17:30", "activity": "Afternoon repairs", "locationId": "loc_auto_shop" },
-        { "start": "17:30", "end": "19:00", "activity": "Chess with Frank", "locationId": "loc_town_square" },
-        { "start": "19:00", "end": "21:30", "activity": "Home, radio, early night", "locationId": "loc_apartment_complex" },
-        { "start": "21:30", "end": "06:30", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+        { "start": "06:30", "end": "07:00", "activity": "Coffee and paper", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "07:00", "end": "07:30", "activity": "Walk to the shop", "actionType": "Idle", "locationId": "loc_town_square" },
+        { "start": "07:30", "end": "12:00", "activity": "Morning repairs", "actionType": "WorkShift", "locationId": "loc_auto_shop" },
+        { "start": "12:00", "end": "12:45", "activity": "Lunch", "actionType": "Eat", "locationId": "loc_corner_diner" },
+        { "start": "12:45", "end": "17:30", "activity": "Afternoon repairs", "actionType": "WorkShift", "locationId": "loc_auto_shop" },
+        { "start": "17:30", "end": "19:00", "activity": "Chess with Frank", "actionType": "Socialize", "locationId": "loc_town_square" },
+        { "start": "19:00", "end": "21:30", "activity": "Home, radio, early night", "actionType": "Idle", "locationId": "loc_apartment_complex" },
+        { "start": "21:30", "end": "06:30", "activity": "Sleep", "actionType": "Sleep", "locationId": "loc_apartment_complex" }
       ],
       "goals": {
         "shortTerm": [ "Fix the Diner's delivery van before it dies on Route 9", "Get Theo to actually show up to his apprenticeship hours" ],
@@ -219,15 +219,15 @@
       "inventoryItemIds": [ "item_phone", "item_badge", "item_coffee_thermos" ],
       "money": 1800,
       "schedule": [
-        { "start": "07:00", "end": "07:45", "activity": "Morning routine", "locationId": "loc_apartment_complex" },
-        { "start": "07:45", "end": "08:00", "activity": "Walk to the station", "locationId": "loc_town_square" },
-        { "start": "08:00", "end": "12:00", "activity": "Day patrol — paperwork and rounds", "locationId": "loc_police_station" },
-        { "start": "12:00", "end": "12:40", "activity": "Lunch", "locationId": "loc_corner_diner" },
-        { "start": "12:40", "end": "16:00", "activity": "Day patrol — rounds", "locationId": "loc_town_square" },
-        { "start": "16:00", "end": "16:30", "activity": "End-of-shift report", "locationId": "loc_police_station" },
-        { "start": "16:30", "end": "18:00", "activity": "Chess with Sal", "locationId": "loc_town_square" },
-        { "start": "18:00", "end": "23:00", "activity": "Home, dinner, TV", "locationId": "loc_apartment_complex" },
-        { "start": "23:00", "end": "07:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+        { "start": "07:00", "end": "07:45", "activity": "Morning routine", "actionType": "Bathe", "locationId": "loc_apartment_complex" },
+        { "start": "07:45", "end": "08:00", "activity": "Walk to the station", "actionType": "Idle", "locationId": "loc_town_square" },
+        { "start": "08:00", "end": "12:00", "activity": "Day patrol — paperwork and rounds", "actionType": "WorkShift", "locationId": "loc_police_station" },
+        { "start": "12:00", "end": "12:40", "activity": "Lunch", "actionType": "Eat", "locationId": "loc_corner_diner" },
+        { "start": "12:40", "end": "16:00", "activity": "Day patrol — rounds", "actionType": "WorkShift", "locationId": "loc_town_square" },
+        { "start": "16:00", "end": "16:30", "activity": "End-of-shift report", "actionType": "WorkShift", "locationId": "loc_police_station" },
+        { "start": "16:30", "end": "18:00", "activity": "Chess with Sal", "actionType": "Socialize", "locationId": "loc_town_square" },
+        { "start": "18:00", "end": "23:00", "activity": "Home, dinner, TV", "actionType": "Idle", "locationId": "loc_apartment_complex" },
+        { "start": "23:00", "end": "07:00", "activity": "Sleep", "actionType": "Sleep", "locationId": "loc_apartment_complex" }
       ],
       "goals": {
         "shortTerm": [ "Figure out who's been leaving gates open all over the east side", "Keep the peace at the Diner without writing anyone up" ],
@@ -278,13 +278,13 @@
       "inventoryItemIds": [ "item_phone", "item_lockpick_set", "item_secondhand_suit" ],
       "money": 85,
       "schedule": [
-        { "start": "09:30", "end": "10:30", "activity": "Slow start, coffee", "locationId": "loc_apartment_complex" },
-        { "start": "10:30", "end": "12:00", "activity": "Scout odd jobs around town", "locationId": "loc_town_square" },
-        { "start": "12:00", "end": "13:00", "activity": "Lunch and eavesdrop at the Diner", "locationId": "loc_corner_diner" },
-        { "start": "13:00", "end": "17:00", "activity": "Odd jobs / wheeling and dealing", "locationId": "loc_town_square" },
-        { "start": "17:00", "end": "19:00", "activity": "Dinner at Aunt Maribel's", "locationId": "loc_apartment_complex" },
-        { "start": "19:00", "end": "22:30", "activity": "Out and about — 'networking'", "locationId": "loc_town_square" },
-        { "start": "22:30", "end": "09:30", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+        { "start": "09:30", "end": "10:30", "activity": "Slow start, coffee", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "10:30", "end": "12:00", "activity": "Scout odd jobs around town", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "12:00", "end": "13:00", "activity": "Lunch and eavesdrop at the Diner", "actionType": "Eat", "locationId": "loc_corner_diner" },
+        { "start": "13:00", "end": "17:00", "activity": "Odd jobs / wheeling and dealing", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "17:00", "end": "19:00", "activity": "Dinner at Aunt Maribel's", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "19:00", "end": "22:30", "activity": "Out and about — 'networking'", "actionType": "Socialize", "locationId": "loc_town_square" },
+        { "start": "22:30", "end": "09:30", "activity": "Sleep", "actionType": "Sleep", "locationId": "loc_apartment_complex" }
       ],
       "goals": {
         "shortTerm": [ "Land one gig that actually pays", "Stay on the right side of Frank — barely" ],
@@ -335,14 +335,14 @@
       "inventoryItemIds": [ "item_phone", "item_casserole_dish", "item_knitting_basket" ],
       "money": 3200,
       "schedule": [
-        { "start": "07:00", "end": "08:00", "activity": "Breakfast, slow morning", "locationId": "loc_apartment_complex" },
-        { "start": "08:00", "end": "09:30", "activity": "Feeds the town-square birds", "locationId": "loc_town_square" },
-        { "start": "09:30", "end": "12:00", "activity": "Groceries and chat", "locationId": "loc_general_store" },
-        { "start": "12:00", "end": "14:00", "activity": "Lunch and nap", "locationId": "loc_apartment_complex" },
-        { "start": "14:00", "end": "16:00", "activity": "Tea with Iris", "locationId": "loc_corner_diner" },
-        { "start": "16:00", "end": "18:00", "activity": "Knitting, porch gossip", "locationId": "loc_apartment_complex" },
-        { "start": "18:00", "end": "20:00", "activity": "Family dinner — Dante or Ruby", "locationId": "loc_apartment_complex" },
-        { "start": "20:00", "end": "07:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+        { "start": "07:00", "end": "08:00", "activity": "Breakfast, slow morning", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "08:00", "end": "09:30", "activity": "Feeds the town-square birds", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "09:30", "end": "12:00", "activity": "Groceries and chat", "actionType": "Socialize", "locationId": "loc_general_store" },
+        { "start": "12:00", "end": "14:00", "activity": "Lunch and nap", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "14:00", "end": "16:00", "activity": "Tea with Iris", "actionType": "Socialize", "locationId": "loc_corner_diner" },
+        { "start": "16:00", "end": "18:00", "activity": "Knitting, porch gossip", "actionType": "Socialize", "locationId": "loc_apartment_complex" },
+        { "start": "18:00", "end": "20:00", "activity": "Family dinner — Dante or Ruby", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "20:00", "end": "07:00", "activity": "Sleep", "actionType": "Sleep", "locationId": "loc_apartment_complex" }
       ],
       "goals": {
         "shortTerm": [ "Get Rosa and Dante in the same room for once — a family dinner, not a shouting match", "Teach Ruby one actually useful recipe" ],
@@ -393,13 +393,13 @@
       "inventoryItemIds": [ "item_phone", "item_bass_guitar", "item_bus_pass" ],
       "money": 120,
       "schedule": [
-        { "start": "09:00", "end": "10:00", "activity": "Get up, breakfast", "locationId": "loc_apartment_complex" },
-        { "start": "10:00", "end": "14:00", "activity": "Community college classes", "locationId": "loc_town_square" },
-        { "start": "14:00", "end": "15:00", "activity": "Lunch at the Diner counter", "locationId": "loc_corner_diner" },
-        { "start": "15:00", "end": "18:00", "activity": "Band practice (bass)", "locationId": "loc_town_square" },
-        { "start": "18:00", "end": "19:30", "activity": "Dinner with Mom", "locationId": "loc_apartment_complex" },
-        { "start": "19:30", "end": "23:00", "activity": "Out with friends", "locationId": "loc_town_square" },
-        { "start": "23:00", "end": "09:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+        { "start": "09:00", "end": "10:00", "activity": "Get up, breakfast", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "10:00", "end": "14:00", "activity": "Community college classes", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "14:00", "end": "15:00", "activity": "Lunch at the Diner counter", "actionType": "Eat", "locationId": "loc_corner_diner" },
+        { "start": "15:00", "end": "18:00", "activity": "Band practice (bass)", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "18:00", "end": "19:30", "activity": "Dinner with Mom", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "19:30", "end": "23:00", "activity": "Out with friends", "actionType": "Socialize", "locationId": "loc_town_square" },
+        { "start": "23:00", "end": "09:00", "activity": "Sleep", "actionType": "Sleep", "locationId": "loc_apartment_complex" }
       ],
       "goals": {
         "shortTerm": [ "Get the band one actual paying gig", "Work up the nerve to actually talk to Vik" ],
@@ -450,14 +450,14 @@
       "inventoryItemIds": [ "item_phone", "item_pruning_shears", "item_flower_crate" ],
       "money": 640,
       "schedule": [
-        { "start": "06:00", "end": "08:00", "activity": "Greenhouse work", "locationId": "loc_town_square" },
-        { "start": "08:00", "end": "09:00", "activity": "Breakfast", "locationId": "loc_apartment_complex" },
-        { "start": "09:00", "end": "12:00", "activity": "Flower stall setup and sales", "locationId": "loc_town_square" },
-        { "start": "12:00", "end": "13:00", "activity": "Lunch", "locationId": "loc_corner_diner" },
-        { "start": "13:00", "end": "17:00", "activity": "Flower stall sales", "locationId": "loc_town_square" },
-        { "start": "17:00", "end": "18:00", "activity": "Coffee with Rosa", "locationId": "loc_corner_diner" },
-        { "start": "18:00", "end": "22:00", "activity": "Home, plan arrangements", "locationId": "loc_apartment_complex" },
-        { "start": "22:00", "end": "06:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+        { "start": "06:00", "end": "08:00", "activity": "Greenhouse work", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "08:00", "end": "09:00", "activity": "Breakfast", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "09:00", "end": "12:00", "activity": "Flower stall setup and sales", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "12:00", "end": "13:00", "activity": "Lunch", "actionType": "Eat", "locationId": "loc_corner_diner" },
+        { "start": "13:00", "end": "17:00", "activity": "Flower stall sales", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "17:00", "end": "18:00", "activity": "Coffee with Rosa", "actionType": "Socialize", "locationId": "loc_corner_diner" },
+        { "start": "18:00", "end": "22:00", "activity": "Home, plan arrangements", "actionType": "PursueGoal", "locationId": "loc_apartment_complex" },
+        { "start": "22:00", "end": "06:00", "activity": "Sleep", "actionType": "Sleep", "locationId": "loc_apartment_complex" }
       ],
       "goals": {
         "shortTerm": [ "Convince the town council the park needs more flower beds", "Sell out the stall three days straight" ],
@@ -508,13 +508,13 @@
       "inventoryItemIds": [ "item_phone", "item_fishing_rod", "item_thermos_flask" ],
       "money": 2800,
       "schedule": [
-        { "start": "06:00", "end": "09:00", "activity": "Fishing at the pond edge", "locationId": "loc_town_square" },
-        { "start": "09:00", "end": "11:00", "activity": "Bench, thermos, chats", "locationId": "loc_town_square" },
-        { "start": "11:00", "end": "12:30", "activity": "Pokes around the Auto Shop", "locationId": "loc_auto_shop" },
-        { "start": "12:30", "end": "14:00", "activity": "Long lunch at the Diner", "locationId": "loc_corner_diner" },
-        { "start": "14:00", "end": "17:00", "activity": "Bench court — holds court, really", "locationId": "loc_town_square" },
-        { "start": "17:00", "end": "20:00", "activity": "Dinner and radio", "locationId": "loc_apartment_complex" },
-        { "start": "20:00", "end": "06:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+        { "start": "06:00", "end": "09:00", "activity": "Fishing at the pond edge", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "09:00", "end": "11:00", "activity": "Bench, thermos, chats", "actionType": "Socialize", "locationId": "loc_town_square" },
+        { "start": "11:00", "end": "12:30", "activity": "Pokes around the Auto Shop", "actionType": "Socialize", "locationId": "loc_auto_shop" },
+        { "start": "12:30", "end": "14:00", "activity": "Long lunch at the Diner", "actionType": "Eat", "locationId": "loc_corner_diner" },
+        { "start": "14:00", "end": "17:00", "activity": "Bench court — holds court, really", "actionType": "Socialize", "locationId": "loc_town_square" },
+        { "start": "17:00", "end": "20:00", "activity": "Dinner and radio", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "20:00", "end": "06:00", "activity": "Sleep", "actionType": "Sleep", "locationId": "loc_apartment_complex" }
       ],
       "goals": {
         "shortTerm": [ "Prove the pond has a twenty-pounder in it", "Get one honest hour of quiet away from Vik's amplifier" ],
@@ -565,12 +565,12 @@
       "inventoryItemIds": [ "item_phone", "item_soldering_iron", "item_amplifier" ],
       "money": 410,
       "schedule": [
-        { "start": "10:00", "end": "12:00", "activity": "Sleep in", "locationId": "loc_apartment_complex" },
-        { "start": "12:00", "end": "13:00", "activity": "Breakfast, repair queue triage", "locationId": "loc_apartment_complex" },
-        { "start": "13:00", "end": "18:00", "activity": "Electronics repair bench", "locationId": "loc_apartment_complex" },
-        { "start": "18:00", "end": "19:00", "activity": "Food run", "locationId": "loc_corner_diner" },
-        { "start": "19:00", "end": "23:30", "activity": "Synth building / loud garage set", "locationId": "loc_town_square" },
-        { "start": "23:30", "end": "10:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+        { "start": "10:00", "end": "12:00", "activity": "Sleep in", "actionType": "Sleep", "locationId": "loc_apartment_complex" },
+        { "start": "12:00", "end": "13:00", "activity": "Breakfast, repair queue triage", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "13:00", "end": "18:00", "activity": "Electronics repair bench", "actionType": "PursueGoal", "locationId": "loc_apartment_complex" },
+        { "start": "18:00", "end": "19:00", "activity": "Food run", "actionType": "Eat", "locationId": "loc_corner_diner" },
+        { "start": "19:00", "end": "23:30", "activity": "Synth building / loud garage set", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "23:30", "end": "10:00", "activity": "Sleep", "actionType": "Sleep", "locationId": "loc_apartment_complex" }
       ],
       "goals": {
         "shortTerm": [ "Finish the modular synth without blowing a fuse", "Rent Ruby's band a proper PA for one night" ],
@@ -622,14 +622,14 @@
       "inventoryItemIds": [ "item_phone", "item_weather_almanac", "item_polish_cloth" ],
       "money": 1500,
       "schedule": [
-        { "start": "06:00", "end": "08:00", "activity": "Beach walk, weather check", "locationId": "loc_town_square" },
-        { "start": "08:00", "end": "09:00", "activity": "Breakfast", "locationId": "loc_apartment_complex" },
-        { "start": "09:00", "end": "12:00", "activity": "Polishes and repairs found objects", "locationId": "loc_apartment_complex" },
-        { "start": "12:00", "end": "13:30", "activity": "Lunch", "locationId": "loc_apartment_complex" },
-        { "start": "13:30", "end": "17:00", "activity": "Nature documentation walk", "locationId": "loc_town_square" },
-        { "start": "17:00", "end": "19:00", "activity": "Early dinner (Vik drifts in when he drifts in)", "locationId": "loc_apartment_complex" },
-        { "start": "19:00", "end": "22:00", "activity": "Tea, almanac, sleep prep", "locationId": "loc_apartment_complex" },
-        { "start": "22:00", "end": "06:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+        { "start": "06:00", "end": "08:00", "activity": "Beach walk, weather check", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "08:00", "end": "09:00", "activity": "Breakfast", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "09:00", "end": "12:00", "activity": "Polishes and repairs found objects", "actionType": "PursueGoal", "locationId": "loc_apartment_complex" },
+        { "start": "12:00", "end": "13:30", "activity": "Lunch", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "13:30", "end": "17:00", "activity": "Nature documentation walk", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "17:00", "end": "19:00", "activity": "Early dinner (Vik drifts in when he drifts in)", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "19:00", "end": "22:00", "activity": "Tea, almanac, sleep prep", "actionType": "Idle", "locationId": "loc_apartment_complex" },
+        { "start": "22:00", "end": "06:00", "activity": "Sleep", "actionType": "Sleep", "locationId": "loc_apartment_complex" }
       ],
       "goals": {
         "shortTerm": [ "Document one new shore species this month", "Keep Vik's noise war from reaching the town meeting agenda" ],
@@ -680,14 +680,14 @@
       "inventoryItemIds": [ "item_phone", "item_sourdough_starter", "item_recipe_box" ],
       "money": 1500,
       "schedule": [
-        { "start": "04:30", "end": "08:00", "activity": "Bakes for the Diner order", "locationId": "loc_apartment_complex" },
-        { "start": "08:00", "end": "09:00", "activity": "Delivers bread to Ana", "locationId": "loc_corner_diner" },
-        { "start": "09:00", "end": "12:00", "activity": "Preps market pastry orders", "locationId": "loc_apartment_complex" },
-        { "start": "12:00", "end": "13:00", "activity": "Lunch with whoever's around", "locationId": "loc_corner_diner" },
-        { "start": "13:00", "end": "17:00", "activity": "Weekend market stall prep", "locationId": "loc_town_square" },
-        { "start": "17:00", "end": "19:00", "activity": "Tea with Maribel", "locationId": "loc_corner_diner" },
-        { "start": "19:00", "end": "21:00", "activity": "Dinner with Frank when shifts allow", "locationId": "loc_apartment_complex" },
-        { "start": "21:00", "end": "04:30", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+        { "start": "04:30", "end": "08:00", "activity": "Bakes for the Diner order", "actionType": "PursueGoal", "locationId": "loc_apartment_complex" },
+        { "start": "08:00", "end": "09:00", "activity": "Delivers bread to Ana", "actionType": "PursueGoal", "locationId": "loc_corner_diner" },
+        { "start": "09:00", "end": "12:00", "activity": "Preps market pastry orders", "actionType": "PursueGoal", "locationId": "loc_apartment_complex" },
+        { "start": "12:00", "end": "13:00", "activity": "Lunch with whoever's around", "actionType": "Eat", "locationId": "loc_corner_diner" },
+        { "start": "13:00", "end": "17:00", "activity": "Weekend market stall prep", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "17:00", "end": "19:00", "activity": "Tea with Maribel", "actionType": "Socialize", "locationId": "loc_corner_diner" },
+        { "start": "19:00", "end": "21:00", "activity": "Dinner with Frank when shifts allow", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "21:00", "end": "04:30", "activity": "Sleep", "actionType": "Sleep", "locationId": "loc_apartment_complex" }
       ],
       "goals": {
         "shortTerm": [ "Land the Diner as a permanent daily bread account", "Win the county fair bread category, again" ],
@@ -738,13 +738,13 @@
       "inventoryItemIds": [ "item_phone", "item_multitool", "item_stick_of_drumsticks" ],
       "money": 95,
       "schedule": [
-        { "start": "09:00", "end": "10:00", "activity": "Wake up, coffee", "locationId": "loc_apartment_complex" },
-        { "start": "10:00", "end": "13:00", "activity": "Handyman rounds", "locationId": "loc_town_square" },
-        { "start": "13:00", "end": "14:00", "activity": "Lunch", "locationId": "loc_corner_diner" },
-        { "start": "14:00", "end": "17:00", "activity": "Odd repairs / 'apprenticeship' hours", "locationId": "loc_auto_shop" },
-        { "start": "17:00", "end": "18:30", "activity": "Guitar on the bench", "locationId": "loc_town_square" },
-        { "start": "18:30", "end": "22:00", "activity": "Dinner, jam with Ruby's band", "locationId": "loc_town_square" },
-        { "start": "22:00", "end": "09:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+        { "start": "09:00", "end": "10:00", "activity": "Wake up, coffee", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "10:00", "end": "13:00", "activity": "Handyman rounds", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "13:00", "end": "14:00", "activity": "Lunch", "actionType": "Eat", "locationId": "loc_corner_diner" },
+        { "start": "14:00", "end": "17:00", "activity": "Odd repairs / 'apprenticeship' hours", "actionType": "PursueGoal", "locationId": "loc_auto_shop" },
+        { "start": "17:00", "end": "18:30", "activity": "Guitar on the bench", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "18:30", "end": "22:00", "activity": "Dinner, jam with Ruby's band", "actionType": "Socialize", "locationId": "loc_town_square" },
+        { "start": "22:00", "end": "09:00", "activity": "Sleep", "actionType": "Sleep", "locationId": "loc_apartment_complex" }
       ],
       "goals": {
         "shortTerm": [ "Pay back the toolbox Sal lent him", "Land one steady contract, any contract" ],
@@ -796,14 +796,14 @@
       "inventoryItemIds": [ "item_phone", "item_pocket_chess_set", "item_packing_tape" ],
       "money": 410,
       "schedule": [
-        { "start": "06:30", "end": "07:15", "activity": "Morning walk — same route, every day", "locationId": "loc_town_square" },
-        { "start": "07:15", "end": "08:00", "activity": "Breakfast", "locationId": "loc_apartment_complex" },
-        { "start": "08:00", "end": "12:00", "activity": "Labels, boxes, cupboards", "locationId": "loc_apartment_complex" },
-        { "start": "12:00", "end": "13:00", "activity": "Lunch", "locationId": "loc_corner_diner" },
-        { "start": "13:00", "end": "17:00", "activity": "Bench — chess with whoever sits down", "locationId": "loc_town_square" },
-        { "start": "17:00", "end": "19:00", "activity": "Workshop hour with Theo", "locationId": "loc_auto_shop" },
-        { "start": "19:00", "end": "22:00", "activity": "Home, radio, bed", "locationId": "loc_apartment_complex" },
-        { "start": "22:00", "end": "06:30", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+        { "start": "06:30", "end": "07:15", "activity": "Morning walk — same route, every day", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "07:15", "end": "08:00", "activity": "Breakfast", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "08:00", "end": "12:00", "activity": "Labels, boxes, cupboards", "actionType": "PursueGoal", "locationId": "loc_apartment_complex" },
+        { "start": "12:00", "end": "13:00", "activity": "Lunch", "actionType": "Eat", "locationId": "loc_corner_diner" },
+        { "start": "13:00", "end": "17:00", "activity": "Bench — chess with whoever sits down", "actionType": "Socialize", "locationId": "loc_town_square" },
+        { "start": "17:00", "end": "19:00", "activity": "Workshop hour with Theo", "actionType": "PursueGoal", "locationId": "loc_auto_shop" },
+        { "start": "19:00", "end": "22:00", "activity": "Home, radio, bed", "actionType": "Idle", "locationId": "loc_apartment_complex" },
+        { "start": "22:00", "end": "06:30", "activity": "Sleep", "actionType": "Sleep", "locationId": "loc_apartment_complex" }
       ],
       "goals": {
         "shortTerm": [ "Build the shelf he keeps describing to Theo", "Beat Sal at chess exactly once, ever" ],
@@ -854,13 +854,13 @@
       "inventoryItemIds": [ "item_phone", "item_crossword_book", "item_binoculars" ],
       "money": 2600,
       "schedule": [
-        { "start": "07:30", "end": "08:30", "activity": "Breakfast, crossword", "locationId": "loc_apartment_complex" },
-        { "start": "08:30", "end": "11:00", "activity": "Morning bench, everyone-watching", "locationId": "loc_town_square" },
-        { "start": "11:00", "end": "12:00", "activity": "Store run — buys the cheapest thing, stays 40 minutes", "locationId": "loc_general_store" },
-        { "start": "12:00", "end": "14:00", "activity": "Lunch at the Diner counter", "locationId": "loc_corner_diner" },
-        { "start": "14:00", "end": "18:00", "activity": "Afternoon bench, gossip distribution", "locationId": "loc_town_square" },
-        { "start": "18:00", "end": "21:00", "activity": "Dinner, TV", "locationId": "loc_apartment_complex" },
-        { "start": "21:00", "end": "07:30", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+        { "start": "07:30", "end": "08:30", "activity": "Breakfast, crossword", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "08:30", "end": "11:00", "activity": "Morning bench, everyone-watching", "actionType": "Socialize", "locationId": "loc_town_square" },
+        { "start": "11:00", "end": "12:00", "activity": "Store run — buys the cheapest thing, stays 40 minutes", "actionType": "Socialize", "locationId": "loc_general_store" },
+        { "start": "12:00", "end": "14:00", "activity": "Lunch at the Diner counter", "actionType": "Eat", "locationId": "loc_corner_diner" },
+        { "start": "14:00", "end": "18:00", "activity": "Afternoon bench, gossip distribution", "actionType": "Socialize", "locationId": "loc_town_square" },
+        { "start": "18:00", "end": "21:00", "activity": "Dinner, TV", "actionType": "Idle", "locationId": "loc_apartment_complex" },
+        { "start": "21:00", "end": "07:30", "activity": "Sleep", "actionType": "Sleep", "locationId": "loc_apartment_complex" }
       ],
       "goals": {
         "shortTerm": [ "Verify the Rosa–Dante story before distributing it", "Beat the crossword before lunch, once" ],
@@ -912,13 +912,13 @@
       "inventoryItemIds": [ "item_phone", "item_worn_script", "item_instant_noodles" ],
       "money": 210,
       "schedule": [
-        { "start": "08:30", "end": "10:00", "activity": "Lines and coffee", "locationId": "loc_apartment_complex" },
-        { "start": "10:00", "end": "13:00", "activity": "Rehearsal space", "locationId": "loc_town_square" },
-        { "start": "13:00", "end": "14:00", "activity": "Lunch", "locationId": "loc_corner_diner" },
-        { "start": "14:00", "end": "18:00", "activity": "Rehearsal / flyer rounds", "locationId": "loc_town_square" },
-        { "start": "18:00", "end": "20:00", "activity": "Evening with Ana", "locationId": "loc_town_square" },
-        { "start": "20:00", "end": "23:30", "activity": "Evening rehearsal / writing", "locationId": "loc_town_square" },
-        { "start": "23:30", "end": "08:30", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+        { "start": "08:30", "end": "10:00", "activity": "Lines and coffee", "actionType": "PursueGoal", "locationId": "loc_apartment_complex" },
+        { "start": "10:00", "end": "13:00", "activity": "Rehearsal space", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "13:00", "end": "14:00", "activity": "Lunch", "actionType": "Eat", "locationId": "loc_corner_diner" },
+        { "start": "14:00", "end": "18:00", "activity": "Rehearsal / flyer rounds", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "18:00", "end": "20:00", "activity": "Evening with Ana", "actionType": "Socialize", "locationId": "loc_town_square" },
+        { "start": "20:00", "end": "23:30", "activity": "Evening rehearsal / writing", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "23:30", "end": "08:30", "activity": "Sleep", "actionType": "Sleep", "locationId": "loc_apartment_complex" }
       ],
       "goals": {
         "shortTerm": [ "Fill seats for Saturday's one-man show", "Stop eating only Ana's cooking for free" ],
@@ -969,13 +969,13 @@
       "inventoryItemIds": [ "item_phone", "item_field_notebook", "item_bird_guide" ],
       "money": 180,
       "schedule": [
-        { "start": "06:30", "end": "07:30", "activity": "Morning bird walk", "locationId": "loc_town_square" },
-        { "start": "07:30", "end": "08:30", "activity": "Breakfast", "locationId": "loc_apartment_complex" },
-        { "start": "08:30", "end": "15:00", "activity": "Classes and library hours", "locationId": "loc_town_square" },
-        { "start": "15:00", "end": "16:00", "activity": "Late lunch", "locationId": "loc_corner_diner" },
-        { "start": "16:00", "end": "19:00", "activity": "Thesis notes at the park", "locationId": "loc_town_square" },
-        { "start": "19:00", "end": "22:00", "activity": "Home, reading", "locationId": "loc_apartment_complex" },
-        { "start": "22:00", "end": "06:30", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+        { "start": "06:30", "end": "07:30", "activity": "Morning bird walk", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "07:30", "end": "08:30", "activity": "Breakfast", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "08:30", "end": "15:00", "activity": "Classes and library hours", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "15:00", "end": "16:00", "activity": "Late lunch", "actionType": "Eat", "locationId": "loc_corner_diner" },
+        { "start": "16:00", "end": "19:00", "activity": "Thesis notes at the park", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "19:00", "end": "22:00", "activity": "Home, reading", "actionType": "PursueGoal", "locationId": "loc_apartment_complex" },
+        { "start": "22:00", "end": "06:30", "activity": "Sleep", "actionType": "Sleep", "locationId": "loc_apartment_complex" }
       ],
       "goals": {
         "shortTerm": [ "Finish the thesis chapter on 'small-town social transmission'", "Photograph the woodpecker before it relocates" ],
@@ -1026,13 +1026,13 @@
       "inventoryItemIds": [ "item_phone", "item_laptop", "item_flashcards" ],
       "money": 260,
       "schedule": [
-        { "start": "06:00", "end": "07:00", "activity": "Run", "locationId": "loc_town_square" },
-        { "start": "07:00", "end": "08:00", "activity": "Breakfast, review flashcards", "locationId": "loc_apartment_complex" },
-        { "start": "08:00", "end": "13:00", "activity": "Classes", "locationId": "loc_town_square" },
-        { "start": "13:00", "end": "14:00", "activity": "Lunch", "locationId": "loc_corner_diner" },
-        { "start": "14:00", "end": "18:00", "activity": "Study block", "locationId": "loc_town_square" },
-        { "start": "18:00", "end": "22:00", "activity": "Night classes", "locationId": "loc_town_square" },
-        { "start": "22:00", "end": "06:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+        { "start": "06:00", "end": "07:00", "activity": "Run", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "07:00", "end": "08:00", "activity": "Breakfast, review flashcards", "actionType": "Eat", "locationId": "loc_apartment_complex" },
+        { "start": "08:00", "end": "13:00", "activity": "Classes", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "13:00", "end": "14:00", "activity": "Lunch", "actionType": "Eat", "locationId": "loc_corner_diner" },
+        { "start": "14:00", "end": "18:00", "activity": "Study block", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "18:00", "end": "22:00", "activity": "Night classes", "actionType": "PursueGoal", "locationId": "loc_town_square" },
+        { "start": "22:00", "end": "06:00", "activity": "Sleep", "actionType": "Sleep", "locationId": "loc_apartment_complex" }
       ],
       "goals": {
         "shortTerm": [ "Ace the licensing exam on the first try", "Get one Saturday entirely offline" ],

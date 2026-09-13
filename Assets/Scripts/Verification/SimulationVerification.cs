@@ -1,3 +1,4 @@
+using SideQuest.Simulation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +36,7 @@ namespace SideQuest.Simulation.Verification
             ok &= Section(log, "4. Extrovert vs introvert diverge; identical-personality control does not", VerifyPersonalityDivergence);
             ok &= Section(log, "5. Feasibility-zero action never picked; feasible controls are picked", VerifyFeasibilityZero);
             ok &= Section(log, "6. LOD: only Active runs a scoring pass", VerifyLod);
-            ok &= Section(log, "7. Typo'd schedule activity is caught, not silent", VerifyUnmappedActivity);
+            ok &= Section(log, "7. Activity is flavor; ActionType controls dispatch", VerifyActivityIsFlavor);
             ok &= Section(log, "8. Scheduled activity happens at the scheduled location", VerifyScheduledVenue);
             ok &= Section(log, "9. One full in-game day, single NPC", VerifyFullDay);
             return ok;
@@ -112,9 +113,9 @@ namespace SideQuest.Simulation.Verification
                 Money = 400,
                 Schedule = new List<ScheduleBlock>
                 {
-                    new ScheduleBlock { Start = H(23), End = H(7), Activity = "Sleep", LocationId = MvpTownData.ApartmentComplex },
-                    new ScheduleBlock { Start = H(7), End = H(15), Activity = "Work", LocationId = MvpTownData.CornerDiner },
-                    new ScheduleBlock { Start = H(19), End = H(22), Activity = "Leisure", LocationId = MvpTownData.TownSquare },
+                    new ScheduleBlock { Start = H(23), End = H(7), Activity = "Sleep", ActionType = NpcAction.Sleep, LocationId = MvpTownData.ApartmentComplex },
+                    new ScheduleBlock { Start = H(7), End = H(15), Activity = "Work", ActionType = NpcAction.WorkShift, LocationId = MvpTownData.CornerDiner },
+                    new ScheduleBlock { Start = H(19), End = H(22), Activity = "Leisure", ActionType = NpcAction.Socialize, LocationId = MvpTownData.TownSquare },
                 },
                 Goals = new Goals
                 {
@@ -215,18 +216,19 @@ namespace SideQuest.Simulation.Verification
             const int trials = 300;
 
             var reference = MakeBarista("npc_reference");
-            float shiftScore = SimulationTuning.ScheduleBaselineUrgency * UtilityScorer.PersonalityWeight(reference.Personality, NpcAction.WorkShift);
+            float shiftScore = SimulationTuning.WorkShiftBaselineUrgency * UtilityScorer.PersonalityWeight(reference.Personality, NpcAction.WorkShift);
             float eatWeight = UtilityScorer.PersonalityWeight(reference.Personality, NpcAction.Eat);
             float crossoverHunger = 100f * (1f - MathF.Pow(shiftScore / eatWeight, 1f / SimulationTuning.UrgencyCurveExponent));
             log.Add($"  Barista, Diligence {reference.Personality.Diligence}, at {midShift} (inside the 07:00-15:00 Work block)");
             log.Add($"  Noise-free, Eat out-scores the shift once Hunger drops below {crossoverHunger:0.0}");
 
-            int CountChoices(float hunger, NpcAction action, bool printBreakdown)
+            int CountChoices(float hunger, NpcAction action, bool printBreakdown, float? diligence = null)
             {
                 int count = 0;
                 for (int seed = 0; seed < trials; seed++)
                 {
                     var npc = MakeBarista("npc_shift_test");
+                    if (diligence.HasValue) npc.Personality.Diligence = diligence.Value;
                     npc.Needs = new Needs { Hunger = hunger, Energy = 80f, Social = 80f, Hygiene = 80f };
                     npc.CurrentLocationId = MvpTownData.CornerDiner;
                     var scores = Scorer(registry, new Random(seed)).ScoreAll(npc, midShift);
@@ -244,6 +246,23 @@ namespace SideQuest.Simulation.Verification
             int controlWorked = CountChoices(80f, NpcAction.WorkShift, true);
             bool ok = Expect(log, starvingAte == trials, $"Hunger 10: chose Eat over the shift in {starvingAte}/{trials} seeded runs");
             ok &= Expect(log, controlWorked == trials, $"control, Hunger 80: stayed on shift in {controlWorked}/{trials} seeded runs");
+
+            foreach (float diligence in new[] { 0f, 0.25f, 1f })
+            {
+                int hungry = CountChoices(10f, NpcAction.Eat, false, diligence);
+                int comfortable = CountChoices(80f, NpcAction.WorkShift, false, diligence);
+                ok &= Expect(log, hungry == trials && comfortable == trials,
+                    $"Diligence {diligence}: hungry NPC eats {hungry}/{trials}; comfortable control works {comfortable}/{trials}");
+            }
+            var lowDiligence = MakeBarista("npc_diligence_control");
+            lowDiligence.Personality.Diligence = 0f;
+            lowDiligence.Needs = new Needs { Hunger = 80, Energy = 80, Social = 80, Hygiene = 80 };
+            float lowWork = Scorer(registry, new Random(42)).ScoreAll(lowDiligence, midShift)
+                .Single(score => score.Action == NpcAction.WorkShift).Final;
+            lowDiligence.Personality.Diligence = 1f;
+            float highWork = Scorer(registry, new Random(42)).ScoreAll(lowDiligence, midShift)
+                .Single(score => score.Action == NpcAction.WorkShift).Final;
+            ok &= Expect(log, highWork > lowWork, $"same needs, venue and seed: diligence still raises work score ({lowWork:0.000} -> {highWork:0.000})");
 
             log.Add($"  Informational sweep near the crossover (Eat rate during the shift, {trials} seeds each):");
             foreach (float hunger in new[] { 15f, 22f, 25f, 27f, 29f, 32f, 40f })
@@ -313,7 +332,7 @@ namespace SideQuest.Simulation.Verification
                 npc.Job = new Job { Title = "Mechanic", WorkplaceId = MvpTownData.AutoShop, Income = 400, Performance = 0.7f };
                 npc.Schedule = new List<ScheduleBlock>
                 {
-                    new ScheduleBlock { Start = H(workStart), End = H(workEnd), Activity = "Work", LocationId = MvpTownData.AutoShop }
+                    new ScheduleBlock { Start = H(workStart), End = H(workEnd), Activity = "Work", ActionType = NpcAction.WorkShift, LocationId = MvpTownData.AutoShop }
                 };
                 npc.Needs = new Needs { Hunger = 95f, Energy = 95f, Social = 95f, Hygiene = 95f };
                 npc.CurrentLocationId = MvpTownData.AutoShop;
@@ -429,20 +448,18 @@ namespace SideQuest.Simulation.Verification
             return ok;
         }
 
-        private static bool VerifyUnmappedActivity(List<string> log)
+        private static bool VerifyActivityIsFlavor(List<string> log)
         {
-            var clean = MakeBarista("npc_clean_schedule");
-            var typo = MakeBarista("npc_typo_schedule");
-            typo.Schedule.Add(new ScheduleBlock { Start = H(15), End = H(17), Activity = "Wrok", LocationId = MvpTownData.CornerDiner });
-
-            var cleanUnmapped = ScheduleService.FindUnmappedActivities(clean);
-            var typoUnmapped = ScheduleService.FindUnmappedActivities(typo);
-            log.Add($"  clean schedule, unmapped: [{string.Join(", ", cleanUnmapped)}]");
-            log.Add($"  typo schedule, unmapped : [{string.Join(", ", typoUnmapped)}]");
-            log.Add($"  what the scorer sees at 16:00 for the typo'd block: {ScheduleService.ScheduledActionAt(typo, H(16))?.ToString() ?? "no scheduled action (the silent failure this lint exists to catch)"}");
-
-            bool ok = Expect(log, cleanUnmapped.Count == 0, "control: clean schedule reports nothing");
-            ok &= Expect(log, typoUnmapped.SequenceEqual(new[] { "Wrok" }), "typo'd 'Wrok' is reported");
+            var npc = MakeBarista("npc_flavor_schedule");
+            bool ok = Expect(log, ScheduleService.ScheduledActionAt(npc, H(10)) == NpcAction.WorkShift, "control: scheduled work dispatches");
+            npc.Schedule[1].Activity = "Sleep";
+            ok &= Expect(log, ScheduleService.ScheduledActionAt(npc, H(10)) == NpcAction.WorkShift, "misleading flavor Sleep still dispatches WorkShift");
+            npc.CurrentTier = SimTier.Background;
+            var sim = new NpcSimulator(Scorer(MvpTownData.CreateRegistry(), new Random(42)));
+            sim.Step(npc, GameTime.At(1, 10), TimeSpan.FromHours(1));
+            ok &= Expect(log, npc.CurrentActivity == NpcAction.WorkShift.ToString(), "Background dispatch also ignores misleading Sleep flavor");
+            npc.Schedule[1].ActionType = NpcAction.Idle;
+            ok &= Expect(log, ScheduleService.ScheduledActionAt(npc, H(10)) == NpcAction.Idle, "changing ActionType changes dispatch to Idle");
             return ok;
         }
 

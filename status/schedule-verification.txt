@@ -1,0 +1,531 @@
+
+=== 0. Test NPC fixture is field-complete (add-npc rule) ===
+  [ ok ] every reference field populated
+RESULT: PASS
+
+=== 1. Game clock: day rollover ===
+  start           : Day 3 23:58
+  +1 min          : Day 3 23:59   events: Ticked(Day 3 23:59)
+  [ ok ] 23:59 is still Day 3
+  [ ok ] no DayStarted before midnight
+  +1 min          : Day 4 00:00   events: DayStarted(4), Ticked(Day 4 00:00)
+  [ ok ] rolls over to Day 4 00:00
+  [ ok ] DayStarted(4) fires exactly once, before Ticked
+  +50 h           : Day 6 02:00   events: DayStarted(5), DayStarted(6), Ticked(Day 6 02:00)
+  [ ok ] Day 4 00:00 + 50h = Day 6 02:00
+  [ ok ] one DayStarted per day boundary crossed
+  ratio           : 12 game-min per real-sec; Day 1 00:00 + 120 real s = Day 2 00:00
+  [ ok ] 120 real seconds is exactly one in-game day at this ratio
+  DateTime bridge : Day 4 13:37 -> 2026-01-04 13:37 -> Day 4 13:37
+  [ ok ] GameTime -> DateTime -> GameTime round-trips exactly
+RESULT: PASS
+
+=== 2. Locations: open/closed lookup ===
+  loc_apartment_complex  Apartment Complex  always open  workplace=False food=True  social=False residence=True
+  loc_auto_shop          Auto Shop          08:00-18:00  workplace=True  food=False social=False residence=False
+  loc_corner_diner       Corner Diner       06:00-22:00  workplace=True  food=True  social=True  residence=False
+  loc_general_store      General Store      08:00-20:00  workplace=True  food=True  social=False residence=False
+  loc_police_station     Police Station     always open  workplace=True  food=False social=False residence=False
+  loc_town_square        Town Square        always open  workplace=False food=False social=True  residence=False
+  [ ok ] 6 MVP locations loaded from data
+  [ ok ] loc_corner_diner at 12:00 -> OPEN
+  [ ok ] loc_corner_diner at 23:00 -> CLOSED
+  [ ok ] loc_corner_diner at 05:59 -> CLOSED
+  [ ok ] loc_corner_diner at 06:00 -> OPEN
+  [ ok ] loc_corner_diner at 22:00 -> CLOSED
+  [ ok ] loc_auto_shop at 03:00 -> CLOSED
+  [ ok ] loc_town_square at 03:00 -> OPEN
+  [ ok ] loc_apartment_complex at 03:00 -> OPEN
+  [ ok ] loc_does_not_exist at 12:00 -> CLOSED
+  [ ok ] overnight hours 18:00-02:00: open at 01:00 and 19:00, closed at 03:00 and 17:00
+RESULT: PASS
+
+=== 3. Starving NPC abandons shift; Hunger-80 control keeps working ===
+  Barista, Diligence 0.6, at Day 1 10:00 (inside the 07:00-15:00 Work block)
+  Noise-free, Eat out-scores the shift once Hunger drops below 18.6
+  Score breakdown at Hunger 10 (seed 0):
+    Eat        final=0.7554 = urg 0.729 x wt 1.00 x feas 1 x noise 1.036 (food at loc_corner_diner)
+    WorkShift  final=0.5146 = urg 0.600 x wt 0.90 x feas 1 x noise 0.953 [scheduled] (shift at loc_corner_diner)
+    PursueGoal final=0.1211 = urg 0.120 x wt 1.00 x feas 1 x noise 1.009 (has goals)
+    Idle       final=0.0532 = urg 0.050 x wt 1.00 x feas 1 x noise 1.065 (always available)
+    Sleep      final=0.0084 = urg 0.008 x wt 1.00 x feas 1 x noise 1.051 (at home)
+    Socialize  final=0.0083 = urg 0.008 x wt 1.00 x feas 1 x noise 1.043 (social venue loc_corner_diner)
+    Bathe      final=0.0081 = urg 0.008 x wt 1.00 x feas 1 x noise 1.009 (at home)
+  Score breakdown at Hunger 80 (seed 0):
+    WorkShift  final=0.5146 = urg 0.600 x wt 0.90 x feas 1 x noise 0.953 [scheduled] (shift at loc_corner_diner)
+    PursueGoal final=0.1211 = urg 0.120 x wt 1.00 x feas 1 x noise 1.009 (has goals)
+    Idle       final=0.0532 = urg 0.050 x wt 1.00 x feas 1 x noise 1.065 (always available)
+    Sleep      final=0.0084 = urg 0.008 x wt 1.00 x feas 1 x noise 1.051 (at home)
+    Socialize  final=0.0083 = urg 0.008 x wt 1.00 x feas 1 x noise 1.043 (social venue loc_corner_diner)
+    Eat        final=0.0083 = urg 0.008 x wt 1.00 x feas 1 x noise 1.036 (food at loc_corner_diner)
+    Bathe      final=0.0081 = urg 0.008 x wt 1.00 x feas 1 x noise 1.009 (at home)
+  [ ok ] Hunger 10: chose Eat over the shift in 300/300 seeded runs
+  [ ok ] control, Hunger 80: stayed on shift in 300/300 seeded runs
+  [ ok ] Diligence 0: hungry NPC eats 300/300; comfortable control works 300/300
+  [ ok ] Diligence 0.25: hungry NPC eats 300/300; comfortable control works 300/300
+  [ ok ] Diligence 1: hungry NPC eats 300/300; comfortable control works 300/300
+  [ ok ] same needs, venue and seed: diligence still raises work score (0.426 -> 0.568)
+  Informational sweep near the crossover (Eat rate during the shift, 300 seeds each):
+    Hunger  15: Eat  98.3%
+    Hunger  22: Eat   2.3%
+    Hunger  25: Eat   0.0%
+    Hunger  27: Eat   0.0%
+    Hunger  29: Eat   0.0%
+    Hunger  32: Eat   0.0%
+    Hunger  40: Eat   0.0%
+RESULT: PASS
+
+=== 4. Extrovert vs introvert diverge; identical-personality control does not ===
+  Identical state at Day 1 17:00 (no scheduled block): Hunger 70, Energy 70, Social 45, Hygiene 70; 2000 seeded runs each
+  Extroversion 0.95: Socialize 100.0%
+  Extroversion 0.05: PursueGoal 100.0%
+  [ ok ] Socialize rate differs by 100.0 points between extrovert and introvert
+  Control A, Extroversion 0.22: PursueGoal 51.2%, Socialize 48.9%
+  Control B, Extroversion 0.22: PursueGoal 51.2%, Socialize 48.8%
+  [ ok ] control: identical personalities differ by only 0.1 points
+  [ ok ] control case is genuinely mixed, so the noise is doing real work rather than one action always winning
+RESULT: PASS
+
+=== 5. Feasibility-zero action never picked; feasible controls are picked ===
+  --- A: Mechanic scheduled 00:00-08:00, Auto Shop open 08:00-18:00, at Day 1 03:00
+    PursueGoal final=0.1211 = urg 0.120 x wt 1.00 x feas 1 x noise 1.009 (has goals)
+    Idle       final=0.0532 = urg 0.050 x wt 1.00 x feas 1 x noise 1.065 (always available)
+    Sleep      final=0.0001 = urg 0.000 x wt 1.00 x feas 1 x noise 1.051 (at home)
+    Socialize  final=0.0001 = urg 0.000 x wt 1.00 x feas 1 x noise 1.043 (social venue loc_town_square)
+    Eat        final=0.0001 = urg 0.000 x wt 1.00 x feas 1 x noise 1.036 (food at loc_apartment_complex)
+    Bathe      final=0.0001 = urg 0.000 x wt 1.00 x feas 1 x noise 1.009 (at home)
+    WorkShift  final=0.0000 = urg 0.600 x wt 0.98 x feas 0 x noise 0.953 [scheduled] (loc_auto_shop closed (08:00-18:00))
+  [ ok ] WorkShift picked in 0/500 seeded runs
+  [ ok ] WorkShift final score was exactly 0 in every run
+  [ ok ] WorkShift's urgency x weight beat every other action's final score in every run, so only feasibility stopped it
+  --- A control: same Mechanic scheduled 08:00-16:00, at Day 1 10:00
+    WorkShift  final=0.5575 = urg 0.600 x wt 0.98 x feas 1 x noise 0.953 [scheduled] (shift at loc_auto_shop)
+    PursueGoal final=0.1211 = urg 0.120 x wt 1.00 x feas 1 x noise 1.009 (has goals)
+    Idle       final=0.0532 = urg 0.050 x wt 1.00 x feas 1 x noise 1.065 (always available)
+    Sleep      final=0.0001 = urg 0.000 x wt 1.00 x feas 1 x noise 1.051 (at home)
+    Socialize  final=0.0001 = urg 0.000 x wt 1.00 x feas 1 x noise 1.043 (social venue loc_corner_diner)
+    Eat        final=0.0001 = urg 0.000 x wt 1.00 x feas 1 x noise 1.036 (food at loc_apartment_complex)
+    Bathe      final=0.0001 = urg 0.000 x wt 1.00 x feas 1 x noise 1.009 (at home)
+  [ ok ] WorkShift picked in 500/500 seeded runs
+  --- B: Hunger 2, home id not in registry, Diner and Store closed, at Day 1 03:00
+    PursueGoal final=0.1211 = urg 0.120 x wt 1.00 x feas 1 x noise 1.009 (has goals)
+    Idle       final=0.0532 = urg 0.050 x wt 1.00 x feas 1 x noise 1.065 (always available)
+    Socialize  final=0.0001 = urg 0.000 x wt 1.00 x feas 1 x noise 1.043 (social venue loc_town_square)
+    Eat        final=0.0000 = urg 0.941 x wt 1.00 x feas 0 x noise 1.036 (no open food source and no usable home)
+    Sleep      final=0.0000 = urg 0.000 x wt 1.00 x feas 0 x noise 1.051 (home 'loc_demolished_house' missing or not a residence)
+    Bathe      final=0.0000 = urg 0.000 x wt 1.00 x feas 0 x noise 1.009 (home 'loc_demolished_house' missing or not a residence)
+    WorkShift  final=0.0000 = urg 0.000 x wt 0.90 x feas 0 x noise 0.953 (unemployed)
+  [ ok ] Eat picked in 0/500 seeded runs
+  [ ok ] Eat final score was exactly 0 in every run
+  [ ok ] Eat's urgency x weight beat every other action's final score in every run, so only feasibility stopped it
+  --- B control: same NPC while the Diner is open, at Day 1 12:00
+    Eat        final=0.9753 = urg 0.941 x wt 1.00 x feas 1 x noise 1.036 (food at loc_corner_diner)
+    PursueGoal final=0.1211 = urg 0.120 x wt 1.00 x feas 1 x noise 1.009 (has goals)
+    Idle       final=0.0532 = urg 0.050 x wt 1.00 x feas 1 x noise 1.065 (always available)
+    Socialize  final=0.0001 = urg 0.000 x wt 1.00 x feas 1 x noise 1.043 (social venue loc_town_square)
+    Sleep      final=0.0000 = urg 0.000 x wt 1.00 x feas 0 x noise 1.051 (home 'loc_demolished_house' missing or not a residence)
+    Bathe      final=0.0000 = urg 0.000 x wt 1.00 x feas 0 x noise 1.009 (home 'loc_demolished_house' missing or not a residence)
+    WorkShift  final=0.0000 = urg 0.000 x wt 0.90 x feas 0 x noise 0.953 (unemployed)
+  [ ok ] Eat picked in 500/500 seeded runs
+RESULT: PASS
+
+=== 6. LOD: only Active runs a scoring pass ===
+  Active     : decision=WorkShift, RNG draws=7, needs now H  73 E  77 S  78 Hy  77
+  [ ok ] Active step ran a full scoring pass (7 actions scored)
+  Background : decision=none, RNG draws=0, activity=WorkShift, needs now H  73 E  77 S  78 Hy  77
+  [ ok ] Background step ran no scoring pass
+  [ ok ] Background needs still decayed
+  [ ok ] Background activity came straight from the schedule (Work block at 11:00)
+  [ ok ] Dormant Step changed nothing
+  Dormant catch-up after 48h: RNG draws=0, activity=WorkShift, needs now H  30 E  30 S  30 Hy  30, last simulated Day 3 10:00
+  [ ok ] catch-up ran no scoring pass
+  [ ok ] 48h of decay resolved in one batch, clamped at the off-screen floor (30)
+  [ ok ] LastSimulatedAt advanced to the catch-up time
+  Control, 2h catch-up: needs now H  66 E  73 S  75 Hy  74
+  [ ok ] control: 2h catch-up decayed Hunger to 66 without clamping
+RESULT: PASS
+
+=== 7. Activity is flavor; ActionType controls dispatch ===
+  [ ok ] control: scheduled work dispatches
+  [ ok ] misleading flavor Sleep still dispatches WorkShift
+  [ ok ] Background dispatch also ignores misleading Sleep flavor
+  [ ok ] changing ActionType changes dispatch to Idle
+RESULT: PASS
+
+=== 8. Scheduled activity happens at the scheduled location ===
+  Barista at home; her Leisure block 19:00-22:00 names loc_town_square.
+  Socialize venue at 20:00 (inside Leisure block): loc_town_square
+  Socialize venue at 17:00 (no block)            : loc_corner_diner
+  [ ok ] inside the block, Socialize goes to the block's location
+  [ ok ] control: with no block, the same NPC lands somewhere else, so the block's location is what moved her
+RESULT: PASS
+
+=== 9. One full in-game day, single NPC ===
+  Mara, Barista. Schedule: Sleep 23-07 (home), Work 07-15 (Corner Diner), Leisure 19-22 (Town Square). Seed 42.
+  Needs are the state the NPC decided on, before that hour played out.
+  time   action     venue                   needs                     scheduled   winner vs runner-up
+  00:00  Sleep      loc_apartment_complex   H  70 E  25 S  70 Hy  80  Sleep       0.398 vs PursueGoal 0.115
+  01:00  Sleep      loc_apartment_complex   H  63 E  34 S  68 Hy  77  Sleep       0.332 vs PursueGoal 0.120
+  02:00  Sleep      loc_apartment_complex   H  56 E  42 S  65 Hy  74  Sleep       0.337 vs PursueGoal 0.121
+  03:00  Sleep      loc_apartment_complex   H  49 E  51 S  63 Hy  71  Sleep       0.327 vs Eat 0.125
+  04:00  Sleep      loc_apartment_complex   H  42 E  59 S  60 Hy  68  Sleep       0.373 vs Eat 0.184
+  05:00  Sleep      loc_apartment_complex   H  35 E  68 S  58 Hy  65  Sleep       0.368 vs Eat 0.278
+  06:00  Eat        loc_apartment_complex   H  28 E  76 S  55 Hy  62  Sleep       0.352 vs Sleep 0.323
+  07:00  WorkShift  loc_corner_diner        H  76 E  73 S  53 Hy  59  WorkShift   0.501 vs PursueGoal 0.122
+  08:00  WorkShift  loc_corner_diner        H  69 E  69 S  50 Hy  56  WorkShift   0.516 vs Socialize 0.142
+  09:00  WorkShift  loc_corner_diner        H  62 E  66 S  48 Hy  53  WorkShift   0.537 vs Socialize 0.165
+  10:00  WorkShift  loc_corner_diner        H  55 E  62 S  45 Hy  50  WorkShift   0.568 vs Socialize 0.183
+  11:00  WorkShift  loc_corner_diner        H  48 E  59 S  43 Hy  47  WorkShift   0.577 vs Socialize 0.194
+  12:00  WorkShift  loc_corner_diner        H  41 E  55 S  40 Hy  44  WorkShift   0.535 vs Socialize 0.233
+  13:00  WorkShift  loc_corner_diner        H  34 E  52 S  38 Hy  41  WorkShift   0.560 vs Socialize 0.286
+  14:00  WorkShift  loc_corner_diner        H  27 E  48 S  35 Hy  38  WorkShift   0.506 vs Eat 0.418
+  15:00  Eat        loc_corner_diner        H  20 E  45 S  33 Hy  35  -           0.535 vs Socialize 0.319
+  16:00  Socialize  loc_corner_diner        H  68 E  41 S  30 Hy  32  -           0.390 vs Bathe 0.304
+  17:00  Bathe      loc_apartment_complex   H  61 E  38 S  58 Hy  29  -           0.331 vs Sleep 0.238
+  18:00  Sleep      loc_apartment_complex   H  54 E  34 S  55 Hy  86  -           0.292 vs PursueGoal 0.113
+  19:00  Socialize  loc_town_square         H  47 E  43 S  53 Hy  83  Socialize   0.400 vs Sleep 0.185
+  20:00  Socialize  loc_town_square         H  40 E  39 S  80 Hy  80  Socialize   0.411 vs Eat 0.230
+  21:00  Socialize  loc_town_square         H  33 E  36 S 100 Hy  77  Socialize   0.373 vs Eat 0.307
+  22:00  Eat        loc_apartment_complex   H  26 E  32 S 100 Hy  74  -           0.437 vs Sleep 0.329
+  23:00  Sleep      loc_apartment_complex   H  74 E  29 S  98 Hy  71  Sleep       0.378 vs PursueGoal 0.127
+  ended at Day 2 00:00; hours per action: Sleep 8, WorkShift 8, Socialize 4, Eat 3, Bathe 1
+  Plausibility guardrails (thresholds I picked, not ground truth; the timeline above is the real evidence):
+  [ ok ] slept 8h (>= 6)
+  [ ok ] spent 3h eating (>= 2)
+  [ ok ] employed as Barista: worked 8 of 8 hours the AI saw as scheduled work (needs > 0 scheduled and >= 75% worked)
+  [ ok ] used 5 distinct actions (>= 4, not one action on repeat)
+  [ ok ] lowest need all day was 20.0 (never bottomed out)
+  [ ok ] 24 hourly steps from Day 1 00:00 end exactly at Day 2 00:00
+RESULT: PASS
+
+=== R1. Real roster loads: count, jobs, Rosa's values ===
+  [ ok ] loaded 18 NPCs (raw JSON array has 18; README says 18)
+  npc_ana_diner      Barista/Cook  @ loc_corner_diner     income   9   performance 0.72
+  npc_rosa_shop      Shopkeeper    @ loc_general_store    income  11   performance 0.27
+  npc_sal_mechanic   Mechanic      @ loc_auto_shop        income  14   performance 0.9
+  npc_frank_cop      Cop           @ loc_police_station   income  16   performance 0.8
+  [ ok ] the employed NPCs are exactly the 4 §21 job holders (found 4)
+  [ ok ] each title and workplace matches §21, and every job field matches the raw JSON
+  [ ok ] the other 14 have Job == null, each an explicit null in the JSON rather than a missing key
+  Rosa loaded : Job.Performance = 0.27, Personality.Diligence = 0.25
+  Rosa in JSON: job.performance = 0.27, personality.diligence = 0.25
+  [ ok ] Rosa's Performance matches the JSON (0.27)
+  [ ok ] Rosa's Diligence matches the JSON (0.25)
+  [ ok ] every loaded NPC has every reference field populated
+  [ ok ] all ActionType values and flavor labels match raw JSON exactly
+  [ ok ] schedule, relationship, memory, and inventory counts match the JSON for all 18 NPCs
+  [ ok ] the file has no player section, so Player is null (the README says the player lives elsewhere)
+RESULT: PASS
+
+=== R2. Corrupted copies fail loudly with the exact error; the unmodified file doesn't ===
+  [ ok ] control: the unmodified file loads with 0 errors
+  --- bad location id: Rosa's workplace 'loc_general_store' -> 'loc_genral_store'
+    error: npcs[1](npc_rosa_shop).job.workplaceId: unknown location id 'loc_genral_store' (known: loc_apartment_complex, loc_auto_shop, loc_corner_diner, loc_general_store, loc_police_station, loc_town_square) (line 89, col 41)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[1](npc_rosa_shop).job.workplaceId saying "unknown location id 'loc_genral_store'"
+  --- relationship to a nonexistent NPC: Rosa -> 'npc_priya_flourist'
+    error: npcs[1](npc_rosa_shop).relationships.npc_priya_flourist: relationship target 'npc_priya_flourist' is not an NPC id in this roster (line 111, col 29)
+    error: npcs[7](npc_priya_florist).relationships.npc_rosa_shop.type: non-mutual Family link: 'npc_rosa_shop' must list 'npc_priya_florist' as Family; reverse type is missing (line 467, col 140)
+  [ ok ] threw RosterLoadException with exactly 2 error(s) (got 2)
+  [ ok ] an error at npcs[1](npc_rosa_shop).relationships.npc_priya_flourist saying "'npc_priya_flourist' is not an NPC id"
+  [ ok ] an error at npcs[7](npc_priya_florist).relationships.npc_rosa_shop.type saying "non-mutual Family link"
+  (a silent default for the next one would give Rosa Diligence 0.0, which changes when her §22 storyline fires)
+  --- missing required field: Rosa's personality.diligence removed
+    error: npcs[1](npc_rosa_shop).personality.diligence: missing required field (line 78, col 22)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[1](npc_rosa_shop).personality.diligence saying "missing required field"
+  --- unknown field: a 'fun' need added to Rosa (the old 6-need schema)
+    error: npcs[1](npc_rosa_shop).needs.fun: unknown field (allowed: hunger, energy, social, hygiene) (line 86, col 88)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[1](npc_rosa_shop).needs.fun saying "unknown field"
+  --- the first three corruptions together in one file
+    error: npcs[1](npc_rosa_shop).personality.diligence: missing required field (line 78, col 22)
+    error: npcs[1](npc_rosa_shop).job.workplaceId: unknown location id 'loc_genral_store' (known: loc_apartment_complex, loc_auto_shop, loc_corner_diner, loc_general_store, loc_police_station, loc_town_square) (line 88, col 41)
+    error: npcs[1](npc_rosa_shop).relationships.npc_priya_flourist: relationship target 'npc_priya_flourist' is not an NPC id in this roster (line 110, col 29)
+    error: npcs[7](npc_priya_florist).relationships.npc_rosa_shop.type: non-mutual Family link: 'npc_rosa_shop' must list 'npc_priya_florist' as Family; reverse type is missing (line 466, col 140)
+  [ ok ] threw RosterLoadException with exactly 4 error(s) (got 4)
+  [ ok ] an error at npcs[1](npc_rosa_shop).job.workplaceId saying "unknown location id 'loc_genral_store'"
+  [ ok ] an error at npcs[1](npc_rosa_shop).relationships.npc_priya_flourist saying "'npc_priya_flourist' is not an NPC id"
+  [ ok ] an error at npcs[7](npc_priya_florist).relationships.npc_rosa_shop.type saying "non-mutual Family link"
+  [ ok ] an error at npcs[1](npc_rosa_shop).personality.diligence saying "missing required field"
+RESULT: PASS
+
+=== R3. Parsing traps that would otherwise let bad values through silently ===
+  Why these matter, shown against the naive approach:
+    Enum.TryParse("0") returns True and yields SimTier.Active
+    NaN < 0 is False, NaN > 100 is False, so a plain range check passes NaN
+    Regex ^HH:MM$ matches "08:30\n": True
+    a 12:00-12:00 block contains 03:00: True
+  --- duplicate key: Rosa's needs lists hunger twice
+    error: $: malformed JSON: Property with the name 'hunger' already exists in the current JSON object. Path 'npcs[1].needs.hunger', line 86, position 42. (line 86, col 42)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at $ saying "already exists"
+  --- numeric enum string: Rosa's currentTier "Active" -> "0"
+    error: npcs[1](npc_rosa_shop).currentTier: must be one of [Active, Background, Dormant], found string "0" (line 130, col 24)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[1](npc_rosa_shop).currentTier saying "must be one of"
+  --- NaN: Rosa's hunger 65.0 -> NaN
+    error: npcs[1](npc_rosa_shop).needs.hunger: must be a number from 0 to 100, found "NaN" (line 86, col 30)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[1](npc_rosa_shop).needs.hunger saying "must be a number from 0 to 100"
+  --- trailing newline in a time: Rosa's first block start "08:30" -> "08:30\n"
+    error: npcs[1](npc_rosa_shop).schedule[0].start: must be a 24-hour HH:MM time like 08:30, found string "08:30\n" (line 97, col 28)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[1](npc_rosa_shop).schedule[0].start saying "must be a 24-hour HH:MM"
+  --- zero-length block: Rosa's 12:00-13:00 lunch -> 12:00-12:00
+    error: npcs[1](npc_rosa_shop).schedule[2].end: equals start (12:00); a block can't start and end at the same time (line 99, col 42)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[1](npc_rosa_shop).schedule[2].end saying "equals start"
+  --- trailing content after the root object
+    error: $: malformed JSON: Additional text encountered after finished reading JSON content: {. Path '', line 1070, position 0. (line 1070, col 0)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at $ saying "after"
+RESULT: PASS
+
+=== R4. Optional player section ===
+  loaded player: Test Player, money 150, karma 0.1, notoriety 0, gigRating 4.8, at loc_town_square
+  [ ok ] control: a valid player section loads with every value intact
+  --- player with gigRating 7.5, an unknown location, and karma removed
+    error: player.karma: missing required field (line 1, col 25)
+    error: player.gigRating: must be a number from 0 to 5, found 7.5 (line 2, col 36)
+    error: player.currentLocationId: unknown location id 'loc_moon' (known: loc_apartment_complex, loc_auto_shop, loc_corner_diner, loc_general_store, loc_police_station, loc_town_square) (line 2, col 92)
+  [ ok ] threw RosterLoadException with exactly 3 error(s) (got 3)
+  [ ok ] an error at player.gigRating saying "must be a number from 0 to 5"
+  [ ok ] an error at player.currentLocationId saying "unknown location id 'loc_moon'"
+  [ ok ] an error at player.karma saying "missing required field"
+RESULT: PASS
+
+=== R5. Roster schedule ActionType values (report, not pass/fail) ===
+  134 schedule blocks across 18 NPCs have validated ActionType values.
+  Blocks at each employed NPC's own workplace, as the utility AI sees them:
+    npc_ana_diner      08:00-15:00  "Diner morning shift" -> WorkShift
+    npc_ana_diner      15:00-15:30  "Lunch break" -> Eat
+    npc_rosa_shop      08:30-09:00  "Open the store (late)" -> WorkShift
+    npc_rosa_shop      09:00-12:00  "Counter shift" -> WorkShift
+    npc_rosa_shop      13:00-17:00  "Counter shift" -> WorkShift
+    npc_sal_mechanic   07:30-12:00  "Morning repairs" -> WorkShift
+    npc_sal_mechanic   12:45-17:30  "Afternoon repairs" -> WorkShift
+    npc_frank_cop      08:00-12:00  "Day patrol — paperwork and rounds" -> WorkShift
+    npc_frank_cop      16:00-16:30  "End-of-shift report" -> WorkShift
+RESULT: REPORT ONLY
+
+=== R6. One full day for Rosa, from her loaded data ===
+  Rosa as loaded: Shopkeeper @ loc_general_store, Diligence 0.25, Performance 0.27, tier Active.
+  Starts at her authored lastSimulatedAt, 2026-09-12 22:00 UTC = Day 255 22:00, with her authored needs. Seed 42, same as check 9.
+  Her schedule, and what the utility AI makes of each block:
+    08:30-09:00  loc_general_store      "Open the store (late)" -> WorkShift
+    09:00-12:00  loc_general_store      "Counter shift" -> WorkShift
+    12:00-13:00  loc_corner_diner       "Long lunch / errands" -> Eat
+    13:00-17:00  loc_general_store      "Counter shift" -> WorkShift
+    17:00-18:00  loc_corner_diner       "Coffee with cousin Priya" -> Socialize
+    18:00-20:00  loc_apartment_complex  "Home TV and ledger" -> Idle
+    20:00-08:30  loc_apartment_complex  "Sleep" -> Sleep
+  Needs are the state the NPC decided on, before that hour played out.
+  time   action     venue                   needs                     scheduled   winner vs runner-up
+  22:00  Sleep      loc_apartment_complex   H  65 E  60 S  70 Hy  75  Sleep       0.330 vs PursueGoal 0.144
+  23:00  Sleep      loc_apartment_complex   H  58 E  69 S  68 Hy  72  Sleep       0.332 vs PursueGoal 0.150
+  00:00  Sleep      loc_apartment_complex   H  51 E  77 S  65 Hy  69  Sleep       0.337 vs PursueGoal 0.152
+  01:00  Sleep      loc_apartment_complex   H  44 E  86 S  63 Hy  66  Sleep       0.327 vs Eat 0.166
+  02:00  Sleep      loc_apartment_complex   H  37 E  94 S  60 Hy  63  Sleep       0.373 vs Eat 0.236
+  03:00  Sleep      loc_apartment_complex   H  30 E 100 S  58 Hy  60  Sleep       0.368 vs Eat 0.348
+  04:00  Eat        loc_apartment_complex   H  23 E 100 S  55 Hy  57  Sleep       0.431 vs Sleep 0.323
+  05:00  Sleep      loc_apartment_complex   H  71 E  97 S  53 Hy  54  Sleep       0.338 vs PursueGoal 0.153
+  06:00  Sleep      loc_apartment_complex   H  64 E 100 S  50 Hy  51  Sleep       0.346 vs Socialize 0.142
+  07:00  Sleep      loc_apartment_complex   H  57 E 100 S  48 Hy  48  Sleep       0.326 vs Socialize 0.165
+  08:00  Sleep      loc_apartment_complex   H  50 E 100 S  45 Hy  45  Sleep       0.351 vs Socialize 0.183
+  09:00  WorkShift  loc_general_store       H  43 E 100 S  43 Hy  42  WorkShift   0.521 vs Bathe 0.208
+  10:00  WorkShift  loc_general_store       H  36 E  97 S  40 Hy  39  WorkShift   0.483 vs Eat 0.267
+  11:00  WorkShift  loc_general_store       H  29 E  93 S  38 Hy  36  WorkShift   0.506 vs Eat 0.352
+  12:00  Eat        loc_corner_diner        H  22 E  90 S  35 Hy  33  Eat         0.509 vs Socialize 0.312
+  13:00  WorkShift  loc_general_store       H  70 E  86 S  33 Hy  30  WorkShift   0.495 vs Bathe 0.327
+  14:00  WorkShift  loc_general_store       H  63 E  83 S  30 Hy  27  WorkShift   0.492 vs Socialize 0.390
+  15:00  WorkShift  loc_general_store       H  56 E  79 S  28 Hy  24  WorkShift   0.466 vs Socialize 0.448
+  16:00  WorkShift  loc_general_store       H  49 E  76 S  25 Hy  21  WorkShift   0.526 vs Bathe 0.461
+  17:00  Bathe      loc_apartment_complex   H  42 E  72 S  23 Hy  18  Socialize   0.580 vs Socialize 0.533
+  18:00  Socialize  loc_corner_diner        H  35 E  69 S  20 Hy  75  Idle        0.602 vs Idle 0.358
+  19:00  Eat        loc_corner_diner        H  28 E  65 S  48 Hy  72  Idle        0.381 vs Idle 0.374
+  20:00  Sleep      loc_apartment_complex   H  76 E  62 S  45 Hy  69  Sleep       0.366 vs Socialize 0.172
+  21:00  Sleep      loc_apartment_complex   H  69 E  70 S  43 Hy  66  Sleep       0.362 vs Socialize 0.196
+  ended at Day 256 22:00; hours per action: Sleep 12, WorkShift 7, Eat 3, Bathe 1, Socialize 1
+  Plausibility guardrails (thresholds I picked, not ground truth; the timeline above is the real evidence):
+  [ ok ] slept 12h (>= 6)
+  [ ok ] spent 3h eating (>= 2)
+  [ ok ] employed as Shopkeeper: worked 7 of 7 hours the AI saw as scheduled work (needs > 0 scheduled and >= 75% worked)
+  [ ok ] used 5 distinct actions (>= 4, not one action on repeat)
+  [ ok ] lowest need all day was 18.0 (never bottomed out)
+  [ ok ] 24 hourly steps from Day 255 22:00 end exactly at Day 256 22:00
+RESULT: PASS
+
+=== R7. Typed schedules, overlap and mutuality controls ===
+  [ ok ] control: all 134 typed blocks load, including touching and midnight-wrapping blocks
+  --- invalid actionType Bogus
+    error: npcs[0](npc_ana_diner).schedule[0].actionType: must be one of [Eat, Sleep, Socialize, Bathe, WorkShift, PursueGoal, Idle], found string "Bogus" (line 47, col 31)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[0](npc_ana_diner).schedule[0].actionType saying "must be"
+  --- invalid actionType 0
+    error: npcs[0](npc_ana_diner).schedule[0].actionType: must be one of [Eat, Sleep, Socialize, Bathe, WorkShift, PursueGoal, Idle], found string "0" (line 47, col 27)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[0](npc_ana_diner).schedule[0].actionType saying "must be"
+  --- invalid actionType 0
+    error: npcs[0](npc_ana_diner).schedule[0].actionType: must be one of [Eat, Sleep, Socialize, Bathe, WorkShift, PursueGoal, Idle], found integer 0 (line 47, col 25)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[0](npc_ana_diner).schedule[0].actionType saying "must be"
+  --- invalid actionType eat
+    error: npcs[0](npc_ana_diner).schedule[0].actionType: must be one of [Eat, Sleep, Socialize, Bathe, WorkShift, PursueGoal, Idle], found string "eat" (line 47, col 29)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[0](npc_ana_diner).schedule[0].actionType saying "must be"
+  --- invalid actionType Eat, Sleep
+    error: npcs[0](npc_ana_diner).schedule[0].actionType: must be one of [Eat, Sleep, Socialize, Bathe, WorkShift, PursueGoal, Idle], found string "Eat, Sleep" (line 47, col 36)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[0](npc_ana_diner).schedule[0].actionType saying "must be"
+  --- invalid actionType 
+    error: npcs[0](npc_ana_diner).schedule[0].actionType: must be one of [Eat, Sleep, Socialize, Bathe, WorkShift, PursueGoal, Idle], found null (line 47, col 28)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[0](npc_ana_diner).schedule[0].actionType saying "must be"
+  --- missing actionType
+    error: npcs[0](npc_ana_diner).schedule[0].actionType: missing required field (line 43, col 9)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[0](npc_ana_diner).schedule[0].actionType saying "missing required field"
+  --- bogus ActionType + overlap + non-mutual Family
+    error: npcs[0](npc_ana_diner).schedule[0].actionType: must be one of [Eat, Sleep, Socialize, Bathe, WorkShift, PursueGoal, Idle], found string "Bogus" (line 47, col 31)
+    error: npcs[0](npc_ana_diner).schedule[1]: schedule block overlaps npcs[0](npc_ana_diner).schedule[0] (an NPC cannot be scheduled twice at once) (line 50, col 9)
+    error: npcs[1](npc_rosa_shop).relationships.npc_priya_florist.type: non-mutual Family link: 'npc_priya_florist' must list 'npc_rosa_shop' as Family; reverse type is Friend (line 263, col 26)
+  [ ok ] threw RosterLoadException with exactly 3 error(s) (got 3)
+  [ ok ] an error at npcs[0](npc_ana_diner).schedule[0].actionType saying "must be"
+  [ ok ] an error at npcs[0](npc_ana_diner).schedule[1] saying "overlaps npcs[0](npc_ana_diner).schedule[0]"
+  [ ok ] an error at npcs[1](npc_rosa_shop).relationships.npc_priya_florist.type saying "non-mutual Family link"
+  --- overlap across midnight: 06:50
+    error: npcs[0](npc_ana_diner).schedule[7]: schedule block overlaps npcs[0](npc_ana_diner).schedule[0] (an NPC cannot be scheduled twice at once) (line 92, col 9)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[0](npc_ana_diner).schedule[7] saying "overlaps npcs[0](npc_ana_diner).schedule[0]"
+  --- overlap across midnight: 23:30
+    error: npcs[0](npc_ana_diner).schedule[7]: schedule block overlaps npcs[0](npc_ana_diner).schedule[0] (an NPC cannot be scheduled twice at once) (line 92, col 9)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[0](npc_ana_diner).schedule[7] saying "overlaps npcs[0](npc_ana_diner).schedule[0]"
+  --- missing reverse Family
+    error: npcs[1](npc_rosa_shop).relationships.npc_priya_florist.type: non-mutual Family link: 'npc_priya_florist' must list 'npc_rosa_shop' as Family; reverse type is missing (line 263, col 26)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[1](npc_rosa_shop).relationships.npc_priya_florist.type saying "non-mutual Family link"
+  --- missing reverse Rival
+    error: npcs[1](npc_rosa_shop).relationships.npc_dante_oddjobs.type: non-mutual Rival link: 'npc_dante_oddjobs' must list 'npc_rosa_shop' as Rival; reverse type is missing (line 256, col 25)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[1](npc_rosa_shop).relationships.npc_dante_oddjobs.type saying "non-mutual Rival link"
+  --- missing reverse Romantic
+    error: npcs[0](npc_ana_diner).relationships.npc_jin_theater.type: non-mutual Romantic link: 'npc_jin_theater' must list 'npc_ana_diner' as Romantic; reverse type is missing (line 115, col 28)
+  [ ok ] threw RosterLoadException with exactly 1 error(s) (got 1)
+  [ ok ] an error at npcs[0](npc_ana_diner).relationships.npc_jin_theater.type saying "non-mutual Romantic link"
+  Negative work control:   [FAIL] employed as Shopkeeper: worked 0 of 0 hours the AI saw as scheduled work (needs > 0 scheduled and >= 75% worked)
+  [ ok ] same work-hours check fails with shifts disabled despite unchanged flavor labels
+RESULT: PASS
+
+=== R8. Loaded work day: npc_ana_diner ===
+  Needs are the state the NPC decided on, before that hour played out.
+  time   action     venue                   needs                     scheduled   winner vs runner-up
+  22:00  Sleep      loc_apartment_complex   H  75 E  70 S  80 Hy  85  Sleep       0.330 vs PursueGoal 0.121
+  23:00  Sleep      loc_apartment_complex   H  68 E  79 S  78 Hy  82  Sleep       0.332 vs PursueGoal 0.126
+  00:00  Sleep      loc_apartment_complex   H  61 E  87 S  75 Hy  79  Sleep       0.337 vs PursueGoal 0.128
+  01:00  Sleep      loc_apartment_complex   H  54 E  96 S  73 Hy  76  Sleep       0.327 vs PursueGoal 0.117
+  02:00  Sleep      loc_apartment_complex   H  47 E 100 S  70 Hy  73  Sleep       0.373 vs Eat 0.140
+  03:00  Sleep      loc_apartment_complex   H  40 E 100 S  68 Hy  70  Sleep       0.368 vs Eat 0.219
+  04:00  Sleep      loc_apartment_complex   H  33 E 100 S  65 Hy  67  Sleep       0.323 vs Eat 0.284
+  05:00  Eat        loc_apartment_complex   H  26 E 100 S  63 Hy  64  Sleep       0.423 vs Sleep 0.338
+  06:00  Sleep      loc_apartment_complex   H  74 E  97 S  60 Hy  61  Sleep       0.346 vs PursueGoal 0.116
+  07:00  Bathe      loc_apartment_complex   H  67 E 100 S  58 Hy  58  Bathe       0.326 vs PursueGoal 0.116
+  08:00  WorkShift  loc_corner_diner        H  60 E  97 S  55 Hy 100  WorkShift   0.584 vs Socialize 0.123
+  09:00  WorkShift  loc_corner_diner        H  53 E  93 S  53 Hy  97  WorkShift   0.593 vs Socialize 0.134
+  10:00  WorkShift  loc_corner_diner        H  46 E  90 S  50 Hy  94  WorkShift   0.549 vs Socialize 0.165
+  11:00  WorkShift  loc_corner_diner        H  39 E  86 S  48 Hy  91  WorkShift   0.576 vs Eat 0.223
+  12:00  WorkShift  loc_corner_diner        H  32 E  83 S  45 Hy  88  WorkShift   0.520 vs Eat 0.337
+  13:00  WorkShift  loc_corner_diner        H  25 E  79 S  43 Hy  85  WorkShift   0.563 vs Eat 0.441
+  14:00  Eat        loc_corner_diner        H  18 E  76 S  40 Hy  82  WorkShift   0.575 vs WorkShift 0.560
+  15:00  Socialize  loc_corner_diner        H  66 E  72 S  38 Hy  79  Eat         0.352 vs Eat 0.323
+  16:00  PursueGoal loc_corner_diner        H  59 E  69 S  65 Hy  76  PursueGoal  0.345 vs Eat 0.066
+  17:00  Socialize  loc_town_square         H  52 E  65 S  63 Hy  73  Socialize   0.491 vs PursueGoal 0.117
+  18:00  Socialize  loc_town_square         H  45 E  62 S  90 Hy  70  Socialize   0.505 vs Eat 0.177
+  19:00  Socialize  loc_town_square         H  38 E  58 S 100 Hy  67  Socialize   0.457 vs Eat 0.243
+  20:00  Eat        loc_apartment_complex   H  31 E  55 S 100 Hy  64  Idle        0.354 vs Idle 0.353
+  21:00  Idle       loc_apartment_complex   H  79 E  51 S  98 Hy  61  Idle        0.347 vs PursueGoal 0.134
+  ended at Day 256 22:00; hours per action: Sleep 8, WorkShift 6, Socialize 4, Eat 3, Bathe 1, PursueGoal 1, Idle 1
+  Plausibility guardrails (thresholds I picked, not ground truth; the timeline above is the real evidence):
+  [ ok ] slept 8h (>= 6)
+  [ ok ] spent 3h eating (>= 2)
+  [ ok ] employed as Barista/Cook: worked 6 of 7 hours the AI saw as scheduled work (needs > 0 scheduled and >= 75% worked)
+  [ ok ] used 7 distinct actions (>= 4, not one action on repeat)
+  [ ok ] lowest need all day was 18.0 (never bottomed out)
+  [ ok ] 24 hourly steps from Day 255 22:00 end exactly at Day 256 22:00
+RESULT: PASS
+
+=== R8. Loaded work day: npc_sal_mechanic ===
+  Needs are the state the NPC decided on, before that hour played out.
+  time   action     venue                   needs                     scheduled   winner vs runner-up
+  22:00  Sleep      loc_apartment_complex   H  70 E  65 S  60 Hy  55  Sleep       0.330 vs PursueGoal 0.092
+  23:00  Sleep      loc_apartment_complex   H  63 E  74 S  58 Hy  52  Sleep       0.332 vs Bathe 0.106
+  00:00  Sleep      loc_apartment_complex   H  56 E  82 S  55 Hy  49  Sleep       0.337 vs Bathe 0.123
+  01:00  Sleep      loc_apartment_complex   H  49 E  91 S  53 Hy  46  Sleep       0.327 vs Bathe 0.165
+  02:00  Sleep      loc_apartment_complex   H  42 E  99 S  50 Hy  43  Sleep       0.373 vs Bathe 0.186
+  03:00  Sleep      loc_apartment_complex   H  35 E 100 S  48 Hy  40  Sleep       0.368 vs Eat 0.278
+  04:00  Eat        loc_apartment_complex   H  28 E 100 S  45 Hy  37  Sleep       0.352 vs Sleep 0.323
+  05:00  Sleep      loc_apartment_complex   H  76 E  97 S  43 Hy  34  Sleep       0.338 vs Bathe 0.271
+  06:00  Sleep      loc_apartment_complex   H  69 E 100 S  40 Hy  31  Sleep       0.346 vs Bathe 0.335
+  07:00  Idle       loc_apartment_complex   H  62 E 100 S  38 Hy  28  Idle        0.367 vs Bathe 0.348
+  08:00  WorkShift  loc_auto_shop           H  55 E  97 S  35 Hy  25  WorkShift   0.616 vs Bathe 0.389
+  09:00  WorkShift  loc_auto_shop           H  48 E  93 S  33 Hy  22  WorkShift   0.625 vs Bathe 0.506
+  10:00  WorkShift  loc_auto_shop           H  41 E  90 S  30 Hy  19  WorkShift   0.579 vs Bathe 0.501
+  11:00  WorkShift  loc_auto_shop           H  34 E  86 S  28 Hy  16  WorkShift   0.607 vs Bathe 0.601
+  12:00  Bathe      loc_apartment_complex   H  27 E  83 S  25 Hy  13  Eat         0.623 vs Eat 0.418
+  13:00  WorkShift  loc_auto_shop           H  20 E  79 S  23 Hy  70  WorkShift   0.594 vs Eat 0.535
+  14:00  Eat        loc_apartment_complex   H  13 E  76 S  20 Hy  67  WorkShift   0.687 vs WorkShift 0.590
+  15:00  WorkShift  loc_auto_shop           H  61 E  72 S  18 Hy  64  WorkShift   0.559 vs Socialize 0.510
+  16:00  WorkShift  loc_auto_shop           H  54 E  69 S  15 Hy  61  WorkShift   0.631 vs Socialize 0.516
+  17:00  Socialize  loc_corner_diner        H  47 E  65 S  13 Hy  58  WorkShift   0.592 vs WorkShift 0.539
+  18:00  Socialize  loc_town_square         H  40 E  62 S  40 Hy  55  Socialize   0.318 vs Eat 0.230
+  19:00  Idle       loc_town_square         H  33 E  58 S  68 Hy  52  Idle        0.374 vs Eat 0.307
+  20:00  Eat        loc_apartment_complex   H  26 E  55 S  65 Hy  49  Idle        0.437 vs Idle 0.353
+  21:00  Idle       loc_apartment_complex   H  74 E  51 S  63 Hy  46  Idle        0.347 vs Bathe 0.160
+  ended at Day 256 22:00; hours per action: Sleep 8, WorkShift 7, Eat 3, Idle 3, Socialize 2, Bathe 1
+  Plausibility guardrails (thresholds I picked, not ground truth; the timeline above is the real evidence):
+  [ ok ] slept 8h (>= 6)
+  [ ok ] spent 3h eating (>= 2)
+  [ ok ] employed as Mechanic: worked 7 of 9 hours the AI saw as scheduled work (needs > 0 scheduled and >= 75% worked)
+  [ ok ] used 6 distinct actions (>= 4, not one action on repeat)
+  [ ok ] lowest need all day was 12.5 (never bottomed out)
+  [ ok ] 24 hourly steps from Day 255 22:00 end exactly at Day 256 22:00
+RESULT: PASS
+
+=== R8. Loaded work day: npc_frank_cop ===
+  Needs are the state the NPC decided on, before that hour played out.
+  time   action     venue                   needs                     scheduled   winner vs runner-up
+  22:00  Idle       loc_apartment_complex   H  72 E  68 S  62 Hy  80  Idle        0.363 vs PursueGoal 0.104
+  23:00  Sleep      loc_apartment_complex   H  65 E  65 S  60 Hy  77  Sleep       0.332 vs PursueGoal 0.108
+  00:00  Sleep      loc_apartment_complex   H  58 E  73 S  57 Hy  74  Sleep       0.337 vs PursueGoal 0.109
+  01:00  Sleep      loc_apartment_complex   H  51 E  82 S  55 Hy  71  Sleep       0.327 vs Eat 0.111
+  02:00  Sleep      loc_apartment_complex   H  44 E  90 S  52 Hy  68  Sleep       0.373 vs Eat 0.166
+  03:00  Sleep      loc_apartment_complex   H  37 E  99 S  50 Hy  65  Sleep       0.368 vs Eat 0.253
+  04:00  Eat        loc_apartment_complex   H  30 E 100 S  47 Hy  62  Sleep       0.324 vs Sleep 0.323
+  05:00  Sleep      loc_apartment_complex   H  78 E  97 S  45 Hy  59  Sleep       0.338 vs Socialize 0.175
+  06:00  Sleep      loc_apartment_complex   H  71 E 100 S  42 Hy  56  Sleep       0.346 vs Socialize 0.202
+  07:00  Bathe      loc_apartment_complex   H  64 E 100 S  40 Hy  53  Bathe       0.326 vs Socialize 0.229
+  08:00  WorkShift  loc_police_station      H  57 E  97 S  37 Hy 100  WorkShift   0.608 vs Socialize 0.250
+  09:00  WorkShift  loc_police_station      H  50 E  93 S  35 Hy  97  WorkShift   0.617 vs Socialize 0.260
+  10:00  WorkShift  loc_police_station      H  43 E  90 S  32 Hy  94  WorkShift   0.572 vs Socialize 0.308
+  11:00  WorkShift  loc_police_station      H  36 E  86 S  30 Hy  91  WorkShift   0.599 vs Socialize 0.373
+  12:00  Socialize  loc_corner_diner        H  29 E  83 S  27 Hy  88  Eat         0.402 vs Eat 0.384
+  13:00  WorkShift  loc_police_station      H  22 E  79 S  55 Hy  85  WorkShift   0.586 vs Eat 0.496
+  14:00  Eat        loc_apartment_complex   H  15 E  76 S  52 Hy  82  WorkShift   0.640 vs WorkShift 0.582
+  15:00  WorkShift  loc_police_station      H  63 E  72 S  50 Hy  79  WorkShift   0.552 vs Socialize 0.138
+  16:00  WorkShift  loc_police_station      H  56 E  69 S  47 Hy  76  WorkShift   0.623 vs Socialize 0.147
+  17:00  Socialize  loc_town_square         H  49 E  65 S  45 Hy  73  Socialize   0.364 vs Eat 0.129
+  18:00  Idle       loc_town_square         H  42 E  62 S  72 Hy  70  Idle        0.358 vs Eat 0.207
+  19:00  Idle       loc_town_square         H  35 E  58 S  70 Hy  67  Idle        0.374 vs Eat 0.280
+  20:00  Eat        loc_apartment_complex   H  28 E  55 S  67 Hy  64  Idle        0.402 vs Idle 0.353
+  21:00  Idle       loc_apartment_complex   H  76 E  51 S  65 Hy  61  Idle        0.347 vs Sleep 0.122
+  ended at Day 256 22:00; hours per action: Sleep 7, WorkShift 7, Idle 4, Eat 3, Socialize 2, Bathe 1
+  Plausibility guardrails (thresholds I picked, not ground truth; the timeline above is the real evidence):
+  [ ok ] slept 7h (>= 6)
+  [ ok ] spent 3h eating (>= 2)
+  [ ok ] employed as Cop: worked 7 of 8 hours the AI saw as scheduled work (needs > 0 scheduled and >= 75% worked)
+  [ ok ] used 6 distinct actions (>= 4, not one action on repeat)
+  [ ok ] lowest need all day was 15.0 (never bottomed out)
+  [ ok ] 24 hourly steps from Day 255 22:00 end exactly at Day 256 22:00
+RESULT: PASS
+OVERALL: PASS

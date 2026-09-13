@@ -76,9 +76,7 @@ namespace SideQuest.Simulation
                 return;
             }
 
-            npc.CurrentActivity = ScheduleService.TryMapActivity(block.Activity, out var action)
-                ? action.ToString()
-                : block.Activity;
+            npc.CurrentActivity = block.ActionType.ToString();
             if (block.LocationId != null) npc.CurrentLocationId = block.LocationId;
         }
     }

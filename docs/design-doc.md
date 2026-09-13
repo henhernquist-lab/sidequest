@@ -132,9 +132,12 @@ public class ScheduleBlock
 {
     public TimeSpan Start;
     public TimeSpan End;
-    public string Activity;
+    public string Activity; // flavor/display only; never read mechanically
+    public NpcAction ActionType; // required; scheduled dispatch uses only this enum
     public string LocationId;
 }
+
+public enum NpcAction { Eat, Sleep, Socialize, Bathe, WorkShift, PursueGoal, Idle }
 
 public class Goals
 {
@@ -181,6 +184,7 @@ public class PlayerCharacter
 
 Key decisions baked into this shape:
 
+- `ScheduleBlock.ActionType` uses the MVP action enum shared with utility AI (§8); JSON requires an exact enum name in `actionType`. `Activity` remains free-form display text. Schedule intervals are start-inclusive/end-exclusive, may wrap midnight, and must not overlap; adjacent blocks are allowed.
 - `Job` is nullable — unemployed NPCs are a real, playable state, not an edge case.
 - `Relationships` keyed by NPC id in a `Dictionary`, not a list — O(1) lookup for "how does X feel about Y," which gets checked constantly (gossip propagation, dialogue).
 - `RelationshipType` is a separate enum from the numeric values — "Rival" is a distinct state, not just "very negative affinity."
@@ -192,6 +196,8 @@ Scaffolded as real C# under `Assets/Scripts/Data/` (one class/enum per file) as 
 ## 8. NPC Decision-Making
 
 Utility AI, not behavior trees or a monolithic state machine — score every candidate action (eat, go to work, socialize, pursue a goal) using needs + personality + context, and pick the highest score, with some randomness/noise so NPCs aren't perfectly optimal robots. Same category of system The Sims uses — worth reading up on "utility AI" and "Sims motive system" specifically.
+
+MVP scheduled dispatch uses `ScheduleBlock.ActionType` (`Eat`, `Sleep`, `Socialize`, `Bathe`, `WorkShift`, `PursueGoal`, `Idle`); `Activity` is display text only. Paid shifts have a stronger schedule urgency floor (0.60) than other scheduled activities (0.35). Work's diligence weight is `0.75 + 0.25 × Diligence`, giving a pre-noise work score of 0.45–0.60: even low-diligence employees have a commitment, and high diligence cannot make it stronger than urgent hunger (Hunger 10 has urgency ≈0.729). Other personality weights keep their existing `0.5 + trait` formula. Feasibility still zeroes impossible actions before selection; needs still override work by outscoring it, with no forced-work branch. These values live in `SimulationTuning` and were verified headlessly on the four employed roster NPCs, not play-tested in Unity.
 
 Big, narratively important decisions (start a business, end a friendship, propose a promotion) are not decided by the LLM directly — they're triggered by deterministic conditions crossing a threshold (e.g., job satisfaction below X for Y days + savings above Z + ambition trait high enough), and the LLM is only consulted to add flavor/plausibility to a decision the math already decided was possible. This keeps the emergent story grounded and prevents the "LLM randomly decides your best friend hates you now" problem.
 
