@@ -8,10 +8,12 @@ namespace SideQuest.Simulation
     public sealed class NpcSimulator
     {
         private readonly UtilityScorer _scorer;
+        private readonly Func<NPC, float> _needsDecayMultiplier;
 
-        public NpcSimulator(UtilityScorer scorer)
+        public NpcSimulator(UtilityScorer scorer, Func<NPC, float> needsDecayMultiplier = null)
         {
             _scorer = scorer;
+            _needsDecayMultiplier = needsDecayMultiplier ?? (_ => 1f);
         }
 
         // Returns the decision for Active NPCs, or null when the tier ran no scoring pass.
@@ -36,7 +38,7 @@ namespace SideQuest.Simulation
         {
             var scores = _scorer.ScoreAll(npc, now);
             var choice = UtilityScorer.Best(scores);
-            NeedsSystem.Decay(npc.Needs, duration.TotalHours);
+            NeedsSystem.Decay(npc.Needs, duration.TotalHours * DecayMultiplier(npc));
             NeedsSystem.ApplyAction(npc.Needs, choice.Action, duration.TotalHours);
 
             npc.CurrentActivity = choice.Action.ToString();
@@ -47,7 +49,7 @@ namespace SideQuest.Simulation
 
         public void StepBackground(NPC npc, GameTime now, TimeSpan duration)
         {
-            NeedsSystem.Decay(npc.Needs, duration.TotalHours);
+            NeedsSystem.Decay(npc.Needs, duration.TotalHours * DecayMultiplier(npc));
             NeedsSystem.ApplyOffscreenFloor(npc.Needs);
 
             GameTime end = now.Plus(duration);
@@ -61,10 +63,18 @@ namespace SideQuest.Simulation
             double elapsedHours = GameTime.HoursBetween(GameTime.FromDateTime(npc.LastSimulatedAt), now);
             if (elapsedHours <= 0) return;
 
-            NeedsSystem.Decay(npc.Needs, elapsedHours);
+            NeedsSystem.Decay(npc.Needs, elapsedHours * DecayMultiplier(npc));
             NeedsSystem.ApplyOffscreenFloor(npc.Needs);
             ApplyScheduleState(npc, now.TimeOfDay);
             npc.LastSimulatedAt = now.ToDateTime();
+        }
+
+        private float DecayMultiplier(NPC npc)
+        {
+            float value = _needsDecayMultiplier(npc);
+            if (float.IsNaN(value) || float.IsInfinity(value) || value <= 0)
+                throw new InvalidOperationException("Needs decay multiplier must be finite and positive.");
+            return value;
         }
 
         private static void ApplyScheduleState(NPC npc, TimeSpan timeOfDay)
