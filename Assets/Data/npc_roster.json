@@ -1,0 +1,1068 @@
+{
+  "$schema_note": "Hand-authored roster data for the Side Quest MVP town. Field-for-field mirror of the finalized NPC schema in docs/design-doc.md §7 (also scaffolded in Assets/Scripts/Data/NPC.cs). No PlayerCharacter here — the player is defined elsewhere. See README.md in this folder for conventions.",
+  "$notes": [
+    "Tension web: Rival pairs = Rosa<->Dante (unpaid seed money) and Lenny<->Vik (noise feud). Family pairs = Maribel<->Dante (aunt/nephew), Maribel<->Ruby (mother/daughter), Priya<->Rosa (cousins), Frank<->Iris (brother/sister), Petra<->Vik (grandmother/grandson). Romantic pair = Ana<->Jin (mutual); Ruby's one-sided interest in Vik is deliberate narrative asymmetry, not a Romantic label.",
+    "Section 22 seed: Rosa (Shopkeeper) — Job.Performance 0.27 is already below the ~0.3 firing threshold with Diligence 0.25, so the deterministic trigger has something to fire on immediately. Errol is a diligence-collision character (0.2) but unemployed, so he is NOT a section-22 employed-trigger candidate.",
+    "Greta is the gossip-network hub: low honesty, high extroversion — her retellings of the Rosa-Dante fight differ by retelling, a human face for the section-9 distortion mechanic.",
+    "Conventions: location ids are the six section-20 MVP locations; item_* ids are forward-declared strings pending an item registry; schedule times are HH:MM local 24h; timestamps are ISO-8601 UTC."
+  ],
+  "npcs": [
+    {
+      "id": "npc_ana_diner",
+      "displayName": "Ana",
+      "age": 26,
+      "appearanceRef": "characters/ana_diner",
+      "personality": {
+        "ambition": 0.55,
+        "extroversion": 0.85,
+        "honesty": 0.7,
+        "riskTolerance": 0.45,
+        "warmth": 0.8,
+        "diligence": 0.7
+      },
+      "needs": { "hunger": 75.0, "energy": 70.0, "social": 80.0, "hygiene": 85.0 },
+      "job": {
+        "title": "Barista/Cook",
+        "workplaceId": "loc_corner_diner",
+        "income": 9,
+        "performance": 0.72
+      },
+      "homeLocationId": "loc_apartment_complex",
+      "inventoryItemIds": [ "item_phone", "item_diner_apron", "item_sketchbook" ],
+      "money": 340,
+      "schedule": [
+        { "start": "07:00", "end": "07:40", "activity": "Get ready", "locationId": "loc_apartment_complex" },
+        { "start": "07:40", "end": "08:00", "activity": "Walk to work", "locationId": "loc_town_square" },
+        { "start": "08:00", "end": "15:00", "activity": "Diner morning shift", "locationId": "loc_corner_diner" },
+        { "start": "15:00", "end": "15:30", "activity": "Lunch break", "locationId": "loc_corner_diner" },
+        { "start": "15:30", "end": "17:00", "activity": "Sketch in the park", "locationId": "loc_town_square" },
+        { "start": "17:00", "end": "19:30", "activity": "Evening with Jin", "locationId": "loc_town_square" },
+        { "start": "19:30", "end": "22:00", "activity": "Home, wind down", "locationId": "loc_apartment_complex" },
+        { "start": "22:00", "end": "07:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+      ],
+      "goals": {
+        "shortTerm": [ "Save enough for a proper sketchbook run", "Keep the regulars tipping" ],
+        "longTerm": [ "Open a tiny gallery-cafe corner in the Diner" ]
+      },
+      "relationships": {
+        "npc_jin_theater": { "affinity": 0.8, "trust": 0.75, "familiarity": 0.85, "lastInteractionAt": "2026-09-12T18:30:00Z", "type": "Romantic" },
+        "npc_rosa_shop": { "affinity": 0.6, "trust": 0.65, "familiarity": 0.7, "lastInteractionAt": "2026-09-12T10:00:00Z", "type": "Friend" },
+        "npc_ruby_student": { "affinity": 0.5, "trust": 0.55, "familiarity": 0.6, "lastInteractionAt": "2026-09-11T16:00:00Z", "type": "Friend" }
+      },
+      "memoryStream": [
+        {
+          "timestamp": "2026-09-12T18:30:00Z",
+          "eventType": "romantic_evening",
+          "description": "Jin walked her home and quoted a play badly on purpose; she laughed the whole way.",
+          "importanceScore": 0.7,
+          "involvedNpcIds": [ "npc_jin_theater" ]
+        },
+        {
+          "timestamp": "2026-09-12T10:00:00Z",
+          "eventType": "gossip",
+          "description": "Rosa mentioned the General Store's seed-money dispute with Dante is still festering.",
+          "importanceScore": 0.4,
+          "involvedNpcIds": [ "npc_rosa_shop", "npc_dante_oddjobs" ]
+        }
+      ],
+      "currentTier": "Active",
+      "lastSimulatedAt": "2026-09-12T22:00:00Z",
+      "currentLocationId": "loc_apartment_complex",
+      "currentActivity": "Sleeping"
+    },
+    {
+      "id": "npc_rosa_shop",
+      "displayName": "Rosa",
+      "age": 52,
+      "appearanceRef": "characters/rosa_shop",
+      "personality": {
+        "ambition": 0.75,
+        "extroversion": 0.6,
+        "honesty": 0.6,
+        "riskTolerance": 0.7,
+        "warmth": 0.35,
+        "diligence": 0.25
+      },
+      "needs": { "hunger": 65.0, "energy": 60.0, "social": 70.0, "hygiene": 75.0 },
+      "job": {
+        "title": "Shopkeeper",
+        "workplaceId": "loc_general_store",
+        "income": 11,
+        "performance": 0.27
+      },
+      "homeLocationId": "loc_apartment_complex",
+      "inventoryItemIds": [ "item_phone", "item_store_keys", "item_ledger_book" ],
+      "money": 1250,
+      "schedule": [
+        { "start": "08:30", "end": "09:00", "activity": "Open the store (late)", "locationId": "loc_general_store" },
+        { "start": "09:00", "end": "12:00", "activity": "Counter shift", "locationId": "loc_general_store" },
+        { "start": "12:00", "end": "13:00", "activity": "Long lunch / errands", "locationId": "loc_corner_diner" },
+        { "start": "13:00", "end": "17:00", "activity": "Counter shift", "locationId": "loc_general_store" },
+        { "start": "17:00", "end": "18:00", "activity": "Coffee with cousin Priya", "locationId": "loc_corner_diner" },
+        { "start": "18:00", "end": "20:00", "activity": "Home TV and ledger", "locationId": "loc_apartment_complex" },
+        { "start": "20:00", "end": "08:30", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+      ],
+      "goals": {
+        "shortTerm": [ "Convince Dante to settle about the seed money", "Keep the shelves stocked without doing the ordering herself" ],
+        "longTerm": [ "Buy the General Store building outright" ]
+      },
+      "relationships": {
+        "npc_dante_oddjobs": { "affinity": -0.75, "trust": 0.1, "familiarity": 0.8, "lastInteractionAt": "2026-09-10T15:30:00Z", "type": "Rival" },
+        "npc_priya_florist": { "affinity": 0.7, "trust": 0.7, "familiarity": 0.75, "lastInteractionAt": "2026-09-12T17:30:00Z", "type": "Family" },
+        "npc_ana_diner": { "affinity": 0.6, "trust": 0.65, "familiarity": 0.7, "lastInteractionAt": "2026-09-12T10:00:00Z", "type": "Friend" }
+      },
+      "memoryStream": [
+        {
+          "timestamp": "2026-09-10T15:30:00Z",
+          "eventType": "argument",
+          "description": "Shouted at Dante across the store about the seed money he 'borrowed' and never repaid.",
+          "importanceScore": 0.85,
+          "involvedNpcIds": [ "npc_dante_oddjobs" ]
+        },
+        {
+          "timestamp": "2026-09-09T11:00:00Z",
+          "eventType": "work_warning",
+          "description": "The store owner warned her the delivery ordering has slipped twice this month.",
+          "importanceScore": 0.6,
+          "involvedNpcIds": []
+        }
+      ],
+      "currentTier": "Active",
+      "lastSimulatedAt": "2026-09-12T22:00:00Z",
+      "currentLocationId": "loc_apartment_complex",
+      "currentActivity": "Sleeping"
+    },
+    {
+      "id": "npc_sal_mechanic",
+      "displayName": "Sal",
+      "age": 58,
+      "appearanceRef": "characters/sal_mechanic",
+      "personality": {
+        "ambition": 0.3,
+        "extroversion": 0.35,
+        "honesty": 0.95,
+        "riskTolerance": 0.2,
+        "warmth": 0.55,
+        "diligence": 0.9
+      },
+      "needs": { "hunger": 70.0, "energy": 65.0, "social": 60.0, "hygiene": 55.0 },
+      "job": {
+        "title": "Mechanic",
+        "workplaceId": "loc_auto_shop",
+        "income": 14,
+        "performance": 0.9
+      },
+      "homeLocationId": "loc_apartment_complex",
+      "inventoryItemIds": [ "item_phone", "item_toolkit", "item_reading_glasses" ],
+      "money": 2100,
+      "schedule": [
+        { "start": "06:30", "end": "07:00", "activity": "Coffee and paper", "locationId": "loc_apartment_complex" },
+        { "start": "07:00", "end": "07:30", "activity": "Walk to the shop", "locationId": "loc_town_square" },
+        { "start": "07:30", "end": "12:00", "activity": "Morning repairs", "locationId": "loc_auto_shop" },
+        { "start": "12:00", "end": "12:45", "activity": "Lunch", "locationId": "loc_corner_diner" },
+        { "start": "12:45", "end": "17:30", "activity": "Afternoon repairs", "locationId": "loc_auto_shop" },
+        { "start": "17:30", "end": "19:00", "activity": "Chess with Frank", "locationId": "loc_town_square" },
+        { "start": "19:00", "end": "21:30", "activity": "Home, radio, early night", "locationId": "loc_apartment_complex" },
+        { "start": "21:30", "end": "06:30", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+      ],
+      "goals": {
+        "shortTerm": [ "Fix the Diner's delivery van before it dies on Route 9", "Get Theo to actually show up to his apprenticeship hours" ],
+        "longTerm": [ "Hand the shop to someone who deserves it" ]
+      },
+      "relationships": {
+        "npc_frank_cop": { "affinity": 0.65, "trust": 0.85, "familiarity": 0.9, "lastInteractionAt": "2026-09-12T18:00:00Z", "type": "Friend" },
+        "npc_theo_handyman": { "affinity": 0.45, "trust": 0.6, "familiarity": 0.65, "lastInteractionAt": "2026-09-11T14:00:00Z", "type": "Acquaintance" },
+        "npc_iris_baker": { "affinity": 0.55, "trust": 0.6, "familiarity": 0.7, "lastInteractionAt": "2026-09-10T09:00:00Z", "type": "Friend" }
+      },
+      "memoryStream": [
+        {
+          "timestamp": "2026-09-12T18:00:00Z",
+          "eventType": "conversation",
+          "description": "Frank mentioned the town's gossip mill has been unusually active about Dante lately.",
+          "importanceScore": 0.4,
+          "involvedNpcIds": [ "npc_frank_cop", "npc_dante_oddjobs" ]
+        },
+        {
+          "timestamp": "2026-09-08T15:00:00Z",
+          "eventType": "work_event",
+          "description": "Finished rebuilding the Auto Shop's compressor; the owner called it his best work in years.",
+          "importanceScore": 0.5,
+          "involvedNpcIds": []
+        }
+      ],
+      "currentTier": "Active",
+      "lastSimulatedAt": "2026-09-12T22:00:00Z",
+      "currentLocationId": "loc_apartment_complex",
+      "currentActivity": "Sleeping"
+    },
+    {
+      "id": "npc_frank_cop",
+      "displayName": "Frank",
+      "age": 47,
+      "appearanceRef": "characters/frank_cop",
+      "personality": {
+        "ambition": 0.4,
+        "extroversion": 0.5,
+        "honesty": 0.9,
+        "riskTolerance": 0.35,
+        "warmth": 0.45,
+        "diligence": 0.85
+      },
+      "needs": { "hunger": 72.0, "energy": 68.0, "social": 62.0, "hygiene": 80.0 },
+      "job": {
+        "title": "Cop",
+        "workplaceId": "loc_police_station",
+        "income": 16,
+        "performance": 0.8
+      },
+      "homeLocationId": "loc_apartment_complex",
+      "inventoryItemIds": [ "item_phone", "item_badge", "item_coffee_thermos" ],
+      "money": 1800,
+      "schedule": [
+        { "start": "07:00", "end": "07:45", "activity": "Morning routine", "locationId": "loc_apartment_complex" },
+        { "start": "07:45", "end": "08:00", "activity": "Walk to the station", "locationId": "loc_town_square" },
+        { "start": "08:00", "end": "12:00", "activity": "Day patrol — paperwork and rounds", "locationId": "loc_police_station" },
+        { "start": "12:00", "end": "12:40", "activity": "Lunch", "locationId": "loc_corner_diner" },
+        { "start": "12:40", "end": "16:00", "activity": "Day patrol — rounds", "locationId": "loc_town_square" },
+        { "start": "16:00", "end": "16:30", "activity": "End-of-shift report", "locationId": "loc_police_station" },
+        { "start": "16:30", "end": "18:00", "activity": "Chess with Sal", "locationId": "loc_town_square" },
+        { "start": "18:00", "end": "23:00", "activity": "Home, dinner, TV", "locationId": "loc_apartment_complex" },
+        { "start": "23:00", "end": "07:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+      ],
+      "goals": {
+        "shortTerm": [ "Figure out who's been leaving gates open all over the east side", "Keep the peace at the Diner without writing anyone up" ],
+        "longTerm": [ "Retire in this town with a reputation for fairness" ]
+      },
+      "relationships": {
+        "npc_sal_mechanic": { "affinity": 0.65, "trust": 0.85, "familiarity": 0.9, "lastInteractionAt": "2026-09-12T18:00:00Z", "type": "Friend" },
+        "npc_iris_baker": { "affinity": 0.6, "trust": 0.75, "familiarity": 0.8, "lastInteractionAt": "2026-09-11T19:00:00Z", "type": "Family" },
+        "npc_dante_oddjobs": { "affinity": -0.3, "trust": 0.35, "familiarity": 0.7, "lastInteractionAt": "2026-09-09T17:00:00Z", "type": "Acquaintance" }
+      },
+      "memoryStream": [
+        {
+          "timestamp": "2026-09-09T17:00:00Z",
+          "eventType": "warning",
+          "description": "Gave Dante a friendly-but-firm warning about 'off the books' deliveries after a complaint.",
+          "importanceScore": 0.55,
+          "involvedNpcIds": [ "npc_dante_oddjobs" ]
+        },
+        {
+          "timestamp": "2026-09-12T18:00:00Z",
+          "eventType": "conversation",
+          "description": "Chess with Sal; Dante's name came up twice unprompted, which is itself a data point.",
+          "importanceScore": 0.45,
+          "involvedNpcIds": [ "npc_sal_mechanic", "npc_dante_oddjobs" ]
+        }
+      ],
+      "currentTier": "Active",
+      "lastSimulatedAt": "2026-09-12T22:00:00Z",
+      "currentLocationId": "loc_apartment_complex",
+      "currentActivity": "Sleeping"
+    },
+    {
+      "id": "npc_dante_oddjobs",
+      "displayName": "Dante",
+      "age": 33,
+      "appearanceRef": "characters/dante_oddjobs",
+      "personality": {
+        "ambition": 0.9,
+        "extroversion": 0.75,
+        "honesty": 0.2,
+        "riskTolerance": 0.85,
+        "warmth": 0.4,
+        "diligence": 0.55
+      },
+      "needs": { "hunger": 60.0, "energy": 65.0, "social": 85.0, "hygiene": 65.0 },
+      "job": null,
+      "homeLocationId": "loc_apartment_complex",
+      "inventoryItemIds": [ "item_phone", "item_lockpick_set", "item_secondhand_suit" ],
+      "money": 85,
+      "schedule": [
+        { "start": "09:30", "end": "10:30", "activity": "Slow start, coffee", "locationId": "loc_apartment_complex" },
+        { "start": "10:30", "end": "12:00", "activity": "Scout odd jobs around town", "locationId": "loc_town_square" },
+        { "start": "12:00", "end": "13:00", "activity": "Lunch and eavesdrop at the Diner", "locationId": "loc_corner_diner" },
+        { "start": "13:00", "end": "17:00", "activity": "Odd jobs / wheeling and dealing", "locationId": "loc_town_square" },
+        { "start": "17:00", "end": "19:00", "activity": "Dinner at Aunt Maribel's", "locationId": "loc_apartment_complex" },
+        { "start": "19:00", "end": "22:30", "activity": "Out and about — 'networking'", "locationId": "loc_town_square" },
+        { "start": "22:30", "end": "09:30", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+      ],
+      "goals": {
+        "shortTerm": [ "Land one gig that actually pays", "Stay on the right side of Frank — barely" ],
+        "longTerm": [ "Own the General Store building out from under Rosa" ]
+      },
+      "relationships": {
+        "npc_rosa_shop": { "affinity": -0.7, "trust": 0.15, "familiarity": 0.8, "lastInteractionAt": "2026-09-10T15:30:00Z", "type": "Rival" },
+        "npc_maribel_retired": { "affinity": 0.7, "trust": 0.8, "familiarity": 0.9, "lastInteractionAt": "2026-09-12T18:00:00Z", "type": "Family" },
+        "npc_jin_theater": { "affinity": 0.45, "trust": 0.5, "familiarity": 0.6, "lastInteractionAt": "2026-09-11T21:00:00Z", "type": "Friend" }
+      },
+      "memoryStream": [
+        {
+          "timestamp": "2026-09-10T15:30:00Z",
+          "eventType": "argument",
+          "description": "Rosa screamed about the seed money again; technically he never said 'loan,' and he intends to keep it that way.",
+          "importanceScore": 0.85,
+          "involvedNpcIds": [ "npc_rosa_shop" ]
+        },
+        {
+          "timestamp": "2026-09-09T17:00:00Z",
+          "eventType": "police_warning",
+          "description": "Frank leaned on him about off-the-books deliveries; smile, nod, keep moving.",
+          "importanceScore": 0.55,
+          "involvedNpcIds": [ "npc_frank_cop" ]
+        }
+      ],
+      "currentTier": "Active",
+      "lastSimulatedAt": "2026-09-12T22:00:00Z",
+      "currentLocationId": "loc_apartment_complex",
+      "currentActivity": "Sleeping"
+    },
+    {
+      "id": "npc_maribel_retired",
+      "displayName": "Maribel",
+      "age": 71,
+      "appearanceRef": "characters/maribel_retired",
+      "personality": {
+        "ambition": 0.25,
+        "extroversion": 0.65,
+        "honesty": 0.8,
+        "riskTolerance": 0.3,
+        "warmth": 0.9,
+        "diligence": 0.6
+      },
+      "needs": { "hunger": 68.0, "energy": 45.0, "social": 75.0, "hygiene": 80.0 },
+      "job": null,
+      "homeLocationId": "loc_apartment_complex",
+      "inventoryItemIds": [ "item_phone", "item_casserole_dish", "item_knitting_basket" ],
+      "money": 3200,
+      "schedule": [
+        { "start": "07:00", "end": "08:00", "activity": "Breakfast, slow morning", "locationId": "loc_apartment_complex" },
+        { "start": "08:00", "end": "09:30", "activity": "Feeds the town-square birds", "locationId": "loc_town_square" },
+        { "start": "09:30", "end": "12:00", "activity": "Groceries and chat", "locationId": "loc_general_store" },
+        { "start": "12:00", "end": "14:00", "activity": "Lunch and nap", "locationId": "loc_apartment_complex" },
+        { "start": "14:00", "end": "16:00", "activity": "Tea with Iris", "locationId": "loc_corner_diner" },
+        { "start": "16:00", "end": "18:00", "activity": "Knitting, porch gossip", "locationId": "loc_apartment_complex" },
+        { "start": "18:00", "end": "20:00", "activity": "Family dinner — Dante or Ruby", "locationId": "loc_apartment_complex" },
+        { "start": "20:00", "end": "07:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+      ],
+      "goals": {
+        "shortTerm": [ "Get Rosa and Dante in the same room for once — a family dinner, not a shouting match", "Teach Ruby one actually useful recipe" ],
+        "longTerm": [ "Keep this family in one piece" ]
+      },
+      "relationships": {
+        "npc_dante_oddjobs": { "affinity": 0.7, "trust": 0.8, "familiarity": 0.9, "lastInteractionAt": "2026-09-12T18:00:00Z", "type": "Family" },
+        "npc_ruby_student": { "affinity": 0.85, "trust": 0.9, "familiarity": 0.9, "lastInteractionAt": "2026-09-11T18:30:00Z", "type": "Family" },
+        "npc_iris_baker": { "affinity": 0.6, "trust": 0.7, "familiarity": 0.75, "lastInteractionAt": "2026-09-11T15:00:00Z", "type": "Friend" }
+      },
+      "memoryStream": [
+        {
+          "timestamp": "2026-09-12T18:00:00Z",
+          "eventType": "conversation",
+          "description": "Dante swears the seed-money thing with Rosa is 'nearly resolved,' which from Dante means nothing.",
+          "importanceScore": 0.5,
+          "involvedNpcIds": [ "npc_dante_oddjobs", "npc_rosa_shop" ]
+        },
+        {
+          "timestamp": "2026-09-11T18:30:00Z",
+          "eventType": "conversation",
+          "description": "Ruby mentioned Vik again — third time this week. Maribel counts these things.",
+          "importanceScore": 0.45,
+          "involvedNpcIds": [ "npc_ruby_student", "npc_vik_nightowl" ]
+        }
+      ],
+      "currentTier": "Background",
+      "lastSimulatedAt": "2026-09-12T20:00:00Z",
+      "currentLocationId": "loc_apartment_complex",
+      "currentActivity": "Sleeping"
+    },
+    {
+      "id": "npc_ruby_student",
+      "displayName": "Ruby",
+      "age": 19,
+      "appearanceRef": "characters/ruby_student",
+      "personality": {
+        "ambition": 0.4,
+        "extroversion": 0.8,
+        "honesty": 0.65,
+        "riskTolerance": 0.6,
+        "warmth": 0.7,
+        "diligence": 0.5
+      },
+      "needs": { "hunger": 72.0, "energy": 75.0, "social": 88.0, "hygiene": 70.0 },
+      "job": null,
+      "homeLocationId": "loc_apartment_complex",
+      "inventoryItemIds": [ "item_phone", "item_bass_guitar", "item_bus_pass" ],
+      "money": 120,
+      "schedule": [
+        { "start": "09:00", "end": "10:00", "activity": "Get up, breakfast", "locationId": "loc_apartment_complex" },
+        { "start": "10:00", "end": "14:00", "activity": "Community college classes", "locationId": "loc_town_square" },
+        { "start": "14:00", "end": "15:00", "activity": "Lunch at the Diner counter", "locationId": "loc_corner_diner" },
+        { "start": "15:00", "end": "18:00", "activity": "Band practice (bass)", "locationId": "loc_town_square" },
+        { "start": "18:00", "end": "19:30", "activity": "Dinner with Mom", "locationId": "loc_apartment_complex" },
+        { "start": "19:30", "end": "23:00", "activity": "Out with friends", "locationId": "loc_town_square" },
+        { "start": "23:00", "end": "09:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+      ],
+      "goals": {
+        "shortTerm": [ "Get the band one actual paying gig", "Work up the nerve to actually talk to Vik" ],
+        "longTerm": [ "Play a real stage, even a small one" ]
+      },
+      "relationships": {
+        "npc_maribel_retired": { "affinity": 0.85, "trust": 0.9, "familiarity": 0.9, "lastInteractionAt": "2026-09-11T18:30:00Z", "type": "Family" },
+        "npc_vik_nightowl": { "affinity": 0.55, "trust": 0.4, "familiarity": 0.3, "lastInteractionAt": "2026-09-12T20:00:00Z", "type": "Acquaintance" },
+        "npc_theo_handyman": { "affinity": 0.6, "trust": 0.65, "familiarity": 0.7, "lastInteractionAt": "2026-09-11T16:30:00Z", "type": "Friend" }
+      },
+      "memoryStream": [
+        {
+          "timestamp": "2026-09-12T20:00:00Z",
+          "eventType": "small_moment",
+          "description": "Vik complimented her bass tone without being asked. She has thought about it for four hours.",
+          "importanceScore": 0.6,
+          "involvedNpcIds": [ "npc_vik_nightowl" ]
+        },
+        {
+          "timestamp": "2026-09-11T16:30:00Z",
+          "eventType": "band_practice",
+          "description": "Theo filled in on drums again; he is actually good and refuses to admit it.",
+          "importanceScore": 0.4,
+          "involvedNpcIds": [ "npc_theo_handyman" ]
+        }
+      ],
+      "currentTier": "Active",
+      "lastSimulatedAt": "2026-09-12T22:00:00Z",
+      "currentLocationId": "loc_apartment_complex",
+      "currentActivity": "Sleeping"
+    },
+    {
+      "id": "npc_priya_florist",
+      "displayName": "Priya",
+      "age": 36,
+      "appearanceRef": "characters/priya_florist",
+      "personality": {
+        "ambition": 0.6,
+        "extroversion": 0.55,
+        "honesty": 0.75,
+        "riskTolerance": 0.4,
+        "warmth": 0.8,
+        "diligence": 0.75
+      },
+      "needs": { "hunger": 70.0, "energy": 65.0, "social": 72.0, "hygiene": 82.0 },
+      "job": null,
+      "homeLocationId": "loc_apartment_complex",
+      "inventoryItemIds": [ "item_phone", "item_pruning_shears", "item_flower_crate" ],
+      "money": 640,
+      "schedule": [
+        { "start": "06:00", "end": "08:00", "activity": "Greenhouse work", "locationId": "loc_town_square" },
+        { "start": "08:00", "end": "09:00", "activity": "Breakfast", "locationId": "loc_apartment_complex" },
+        { "start": "09:00", "end": "12:00", "activity": "Flower stall setup and sales", "locationId": "loc_town_square" },
+        { "start": "12:00", "end": "13:00", "activity": "Lunch", "locationId": "loc_corner_diner" },
+        { "start": "13:00", "end": "17:00", "activity": "Flower stall sales", "locationId": "loc_town_square" },
+        { "start": "17:00", "end": "18:00", "activity": "Coffee with Rosa", "locationId": "loc_corner_diner" },
+        { "start": "18:00", "end": "22:00", "activity": "Home, plan arrangements", "locationId": "loc_apartment_complex" },
+        { "start": "22:00", "end": "06:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+      ],
+      "goals": {
+        "shortTerm": [ "Convince the town council the park needs more flower beds", "Sell out the stall three days straight" ],
+        "longTerm": [ "A real storefront for the flowers, someday" ]
+      },
+      "relationships": {
+        "npc_rosa_shop": { "affinity": 0.7, "trust": 0.7, "familiarity": 0.75, "lastInteractionAt": "2026-09-12T17:30:00Z", "type": "Family" },
+        "npc_iris_baker": { "affinity": 0.65, "trust": 0.7, "familiarity": 0.7, "lastInteractionAt": "2026-09-11T13:00:00Z", "type": "Friend" },
+        "npc_lenny_retired": { "affinity": 0.4, "trust": 0.6, "familiarity": 0.55, "lastInteractionAt": "2026-09-10T10:00:00Z", "type": "Acquaintance" }
+      },
+      "memoryStream": [
+        {
+          "timestamp": "2026-09-12T17:30:00Z",
+          "eventType": "conversation",
+          "description": "Rosa vented about Dante again; Priya keeps her cousin's ledger of grievances better than her own accounts.",
+          "importanceScore": 0.4,
+          "involvedNpcIds": [ "npc_rosa_shop", "npc_dante_oddjobs" ]
+        },
+        {
+          "timestamp": "2026-09-10T10:00:00Z",
+          "eventType": "business_chat",
+          "description": "Lenny pitched her a 'ride-along flower delivery route' idea; it was mostly an excuse to talk.",
+          "importanceScore": 0.3,
+          "involvedNpcIds": [ "npc_lenny_retired" ]
+        }
+      ],
+      "currentTier": "Background",
+      "lastSimulatedAt": "2026-09-12T20:00:00Z",
+      "currentLocationId": "loc_apartment_complex",
+      "currentActivity": "Sleeping"
+    },
+    {
+      "id": "npc_lenny_retired",
+      "displayName": "Lenny",
+      "age": 66,
+      "appearanceRef": "characters/lenny_retired",
+      "personality": {
+        "ambition": 0.2,
+        "extroversion": 0.9,
+        "honesty": 0.55,
+        "riskTolerance": 0.5,
+        "warmth": 0.75,
+        "diligence": 0.35
+      },
+      "needs": { "hunger": 66.0, "energy": 55.0, "social": 90.0, "hygiene": 72.0 },
+      "job": null,
+      "homeLocationId": "loc_apartment_complex",
+      "inventoryItemIds": [ "item_phone", "item_fishing_rod", "item_thermos_flask" ],
+      "money": 2800,
+      "schedule": [
+        { "start": "06:00", "end": "09:00", "activity": "Fishing at the pond edge", "locationId": "loc_town_square" },
+        { "start": "09:00", "end": "11:00", "activity": "Bench, thermos, chats", "locationId": "loc_town_square" },
+        { "start": "11:00", "end": "12:30", "activity": "Pokes around the Auto Shop", "locationId": "loc_auto_shop" },
+        { "start": "12:30", "end": "14:00", "activity": "Long lunch at the Diner", "locationId": "loc_corner_diner" },
+        { "start": "14:00", "end": "17:00", "activity": "Bench court — holds court, really", "locationId": "loc_town_square" },
+        { "start": "17:00", "end": "20:00", "activity": "Dinner and radio", "locationId": "loc_apartment_complex" },
+        { "start": "20:00", "end": "06:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+      ],
+      "goals": {
+        "shortTerm": [ "Prove the pond has a twenty-pounder in it", "Get one honest hour of quiet away from Vik's amplifier" ],
+        "longTerm": [ "Never wear anything with a name tag again" ]
+      },
+      "relationships": {
+        "npc_vik_nightowl": { "affinity": -0.6, "trust": 0.3, "familiarity": 0.6, "lastInteractionAt": "2026-09-11T22:00:00Z", "type": "Rival" },
+        "npc_sal_mechanic": { "affinity": 0.5, "trust": 0.7, "familiarity": 0.8, "lastInteractionAt": "2026-09-11T11:30:00Z", "type": "Friend" },
+        "npc_priya_florist": { "affinity": 0.4, "trust": 0.6, "familiarity": 0.55, "lastInteractionAt": "2026-09-10T10:00:00Z", "type": "Acquaintance" }
+      },
+      "memoryStream": [
+        {
+          "timestamp": "2026-09-11T22:00:00Z",
+          "eventType": "noise_complaint",
+          "description": "Vik's garage set ran past ten again. Lenny was over there by 22:15 yelling about bass frequencies like a man who knows them.",
+          "importanceScore": 0.5,
+          "involvedNpcIds": [ "npc_vik_nightowl" ]
+        },
+        {
+          "timestamp": "2026-09-08T06:45:00Z",
+          "eventType": "fishing_story",
+          "description": "Told anyone within earshot about the twenty-pounder. Nobody believes him. He does not care.",
+          "importanceScore": 0.25,
+          "involvedNpcIds": []
+        }
+      ],
+      "currentTier": "Background",
+      "lastSimulatedAt": "2026-09-12T20:00:00Z",
+      "currentLocationId": "loc_apartment_complex",
+      "currentActivity": "Sleeping"
+    },
+    {
+      "id": "npc_vik_nightowl",
+      "displayName": "Vik",
+      "age": 24,
+      "appearanceRef": "characters/vik_nightowl",
+      "personality": {
+        "ambition": 0.7,
+        "extroversion": 0.45,
+        "honesty": 0.5,
+        "riskTolerance": 0.75,
+        "warmth": 0.5,
+        "diligence": 0.8
+      },
+      "needs": { "hunger": 62.0, "energy": 70.0, "social": 65.0, "hygiene": 60.0 },
+      "job": null,
+      "homeLocationId": "loc_apartment_complex",
+      "inventoryItemIds": [ "item_phone", "item_soldering_iron", "item_amplifier" ],
+      "money": 410,
+      "schedule": [
+        { "start": "10:00", "end": "12:00", "activity": "Sleep in", "locationId": "loc_apartment_complex" },
+        { "start": "12:00", "end": "13:00", "activity": "Breakfast, repair queue triage", "locationId": "loc_apartment_complex" },
+        { "start": "13:00", "end": "18:00", "activity": "Electronics repair bench", "locationId": "loc_apartment_complex" },
+        { "start": "18:00", "end": "19:00", "activity": "Food run", "locationId": "loc_corner_diner" },
+        { "start": "19:00", "end": "23:30", "activity": "Synth building / loud garage set", "locationId": "loc_town_square" },
+        { "start": "23:30", "end": "10:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+      ],
+      "goals": {
+        "shortTerm": [ "Finish the modular synth without blowing a fuse", "Rent Ruby's band a proper PA for one night" ],
+        "longTerm": [ "Sell a hand-built synth to someone famous, or at least to someone who posts online" ]
+      },
+      "relationships": {
+        "npc_lenny_retired": { "affinity": -0.6, "trust": 0.3, "familiarity": 0.6, "lastInteractionAt": "2026-09-11T22:00:00Z", "type": "Rival" },
+        "npc_ruby_student": { "affinity": 0.55, "trust": 0.4, "familiarity": 0.3, "lastInteractionAt": "2026-09-12T20:00:00Z", "type": "Acquaintance" },
+        "npc_theo_handyman": { "affinity": 0.4, "trust": 0.5, "familiarity": 0.45, "lastInteractionAt": "2026-09-10T15:00:00Z", "type": "Acquaintance" },
+        "npc_petra_retired": { "affinity": 0.75, "trust": 0.85, "familiarity": 0.9, "lastInteractionAt": "2026-09-12T18:30:00Z", "type": "Family" }
+      },
+      "memoryStream": [
+        {
+          "timestamp": "2026-09-11T22:00:00Z",
+          "eventType": "argument",
+          "description": "Lenny stormed over about the noise. Vik offered him earplugs; this did not help.",
+          "importanceScore": 0.5,
+          "involvedNpcIds": [ "npc_lenny_retired" ]
+        },
+        {
+          "timestamp": "2026-09-12T20:00:00Z",
+          "eventType": "small_moment",
+          "description": "The bassist from the band actually knows signal flow. Noted it. Exactly once.",
+          "importanceScore": 0.5,
+          "involvedNpcIds": [ "npc_ruby_student" ]
+        }
+      ],
+      "currentTier": "Active",
+      "lastSimulatedAt": "2026-09-12T22:00:00Z",
+      "currentLocationId": "loc_apartment_complex",
+      "currentActivity": "Sleeping"
+    },
+    {
+      "id": "npc_petra_retired",
+      "displayName": "Petra",
+      "age": 70,
+      "appearanceRef": "characters/petra_retired",
+      "personality": {
+        "ambition": 0.3,
+        "extroversion": 0.45,
+        "honesty": 1.0,
+        "riskTolerance": 0.35,
+        "warmth": 0.7,
+        "diligence": 0.7
+      },
+      "needs": { "hunger": 70.0, "energy": 58.0, "social": 68.0, "hygiene": 82.0 },
+      "job": null,
+      "homeLocationId": "loc_apartment_complex",
+      "inventoryItemIds": [ "item_phone", "item_weather_almanac", "item_polish_cloth" ],
+      "money": 1500,
+      "schedule": [
+        { "start": "06:00", "end": "08:00", "activity": "Beach walk, weather check", "locationId": "loc_town_square" },
+        { "start": "08:00", "end": "09:00", "activity": "Breakfast", "locationId": "loc_apartment_complex" },
+        { "start": "09:00", "end": "12:00", "activity": "Polishes and repairs found objects", "locationId": "loc_apartment_complex" },
+        { "start": "12:00", "end": "13:30", "activity": "Lunch", "locationId": "loc_apartment_complex" },
+        { "start": "13:30", "end": "17:00", "activity": "Nature documentation walk", "locationId": "loc_town_square" },
+        { "start": "17:00", "end": "19:00", "activity": "Early dinner (Vik drifts in when he drifts in)", "locationId": "loc_apartment_complex" },
+        { "start": "19:00", "end": "22:00", "activity": "Tea, almanac, sleep prep", "locationId": "loc_apartment_complex" },
+        { "start": "22:00", "end": "06:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+      ],
+      "goals": {
+        "shortTerm": [ "Document one new shore species this month", "Keep Vik's noise war from reaching the town meeting agenda" ],
+        "longTerm": [ "Leave behind a complete weather and species record of this coast" ]
+      },
+      "relationships": {
+        "npc_vik_nightowl": { "affinity": 0.75, "trust": 0.85, "familiarity": 0.9, "lastInteractionAt": "2026-09-12T18:30:00Z", "type": "Family" },
+        "npc_iris_baker": { "affinity": 0.6, "trust": 0.65, "familiarity": 0.7, "lastInteractionAt": "2026-09-11T09:00:00Z", "type": "Friend" },
+        "npc_lenny_retired": { "affinity": 0.5, "trust": 0.65, "familiarity": 0.7, "lastInteractionAt": "2026-09-10T09:30:00Z", "type": "Friend" }
+      },
+      "memoryStream": [
+        {
+          "timestamp": "2026-09-12T18:30:00Z",
+          "eventType": "conversation",
+          "description": "Asked Vik directly about the Lenny feud; got a technical answer about speaker placement. Which was a yes.",
+          "importanceScore": 0.45,
+          "involvedNpcIds": [ "npc_vik_nightowl", "npc_lenny_retired" ]
+        },
+        {
+          "timestamp": "2026-09-11T09:00:00Z",
+          "eventType": "conversation",
+          "description": "Iris swapped her a loaf for a jar of beach-plum jam and called it an even trade. It was not; Petra knows.",
+          "importanceScore": 0.35,
+          "involvedNpcIds": [ "npc_iris_baker" ]
+        }
+      ],
+      "currentTier": "Background",
+      "lastSimulatedAt": "2026-09-12T20:00:00Z",
+      "currentLocationId": "loc_apartment_complex",
+      "currentActivity": "Sleeping"
+    },
+    {
+      "id": "npc_iris_baker",
+      "displayName": "Iris",
+      "age": 44,
+      "appearanceRef": "characters/iris_baker",
+      "personality": {
+        "ambition": 0.65,
+        "extroversion": 0.6,
+        "honesty": 0.85,
+        "riskTolerance": 0.55,
+        "warmth": 0.7,
+        "diligence": 0.85
+      },
+      "needs": { "hunger": 70.0, "energy": 62.0, "social": 70.0, "hygiene": 78.0 },
+      "job": null,
+      "homeLocationId": "loc_apartment_complex",
+      "inventoryItemIds": [ "item_phone", "item_sourdough_starter", "item_recipe_box" ],
+      "money": 1500,
+      "schedule": [
+        { "start": "04:30", "end": "08:00", "activity": "Bakes for the Diner order", "locationId": "loc_apartment_complex" },
+        { "start": "08:00", "end": "09:00", "activity": "Delivers bread to Ana", "locationId": "loc_corner_diner" },
+        { "start": "09:00", "end": "12:00", "activity": "Preps market pastry orders", "locationId": "loc_apartment_complex" },
+        { "start": "12:00", "end": "13:00", "activity": "Lunch with whoever's around", "locationId": "loc_corner_diner" },
+        { "start": "13:00", "end": "17:00", "activity": "Weekend market stall prep", "locationId": "loc_town_square" },
+        { "start": "17:00", "end": "19:00", "activity": "Tea with Maribel", "locationId": "loc_corner_diner" },
+        { "start": "19:00", "end": "21:00", "activity": "Dinner with Frank when shifts allow", "locationId": "loc_apartment_complex" },
+        { "start": "21:00", "end": "04:30", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+      ],
+      "goals": {
+        "shortTerm": [ "Land the Diner as a permanent daily bread account", "Win the county fair bread category, again" ],
+        "longTerm": [ "A tiny bakery of her own with her own name on it" ]
+      },
+      "relationships": {
+        "npc_frank_cop": { "affinity": 0.6, "trust": 0.75, "familiarity": 0.8, "lastInteractionAt": "2026-09-11T19:00:00Z", "type": "Family" },
+        "npc_maribel_retired": { "affinity": 0.6, "trust": 0.7, "familiarity": 0.75, "lastInteractionAt": "2026-09-11T15:00:00Z", "type": "Friend" },
+        "npc_priya_florist": { "affinity": 0.65, "trust": 0.7, "familiarity": 0.7, "lastInteractionAt": "2026-09-11T13:00:00Z", "type": "Friend" }
+      },
+      "memoryStream": [
+        {
+          "timestamp": "2026-09-11T19:00:00Z",
+          "eventType": "family_dinner",
+          "description": "Frank dodged every question about the Dante complaint file. She noticed; she always notices.",
+          "importanceScore": 0.5,
+          "involvedNpcIds": [ "npc_frank_cop", "npc_dante_oddjobs" ]
+        },
+        {
+          "timestamp": "2026-09-10T08:30:00Z",
+          "eventType": "business_chat",
+          "description": "Ana pitched making her bread a permanent Diner menu item. Genuinely good news, said so.",
+          "importanceScore": 0.6,
+          "involvedNpcIds": [ "npc_ana_diner" ]
+        }
+      ],
+      "currentTier": "Background",
+      "lastSimulatedAt": "2026-09-12T20:00:00Z",
+      "currentLocationId": "loc_apartment_complex",
+      "currentActivity": "Sleeping"
+    },
+    {
+      "id": "npc_theo_handyman",
+      "displayName": "Theo",
+      "age": 28,
+      "appearanceRef": "characters/theo_handyman",
+      "personality": {
+        "ambition": 0.35,
+        "extroversion": 0.4,
+        "honesty": 0.6,
+        "riskTolerance": 0.5,
+        "warmth": 0.65,
+        "diligence": 0.45
+      },
+      "needs": { "hunger": 68.0, "energy": 66.0, "social": 70.0, "hygiene": 62.0 },
+      "job": null,
+      "homeLocationId": "loc_apartment_complex",
+      "inventoryItemIds": [ "item_phone", "item_multitool", "item_stick_of_drumsticks" ],
+      "money": 95,
+      "schedule": [
+        { "start": "09:00", "end": "10:00", "activity": "Wake up, coffee", "locationId": "loc_apartment_complex" },
+        { "start": "10:00", "end": "13:00", "activity": "Handyman rounds", "locationId": "loc_town_square" },
+        { "start": "13:00", "end": "14:00", "activity": "Lunch", "locationId": "loc_corner_diner" },
+        { "start": "14:00", "end": "17:00", "activity": "Odd repairs / 'apprenticeship' hours", "locationId": "loc_auto_shop" },
+        { "start": "17:00", "end": "18:30", "activity": "Guitar on the bench", "locationId": "loc_town_square" },
+        { "start": "18:30", "end": "22:00", "activity": "Dinner, jam with Ruby's band", "locationId": "loc_town_square" },
+        { "start": "22:00", "end": "09:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+      ],
+      "goals": {
+        "shortTerm": [ "Pay back the toolbox Sal lent him", "Land one steady contract, any contract" ],
+        "longTerm": [ "Stop calling himself 'between things'" ]
+      },
+      "relationships": {
+        "npc_sal_mechanic": { "affinity": 0.45, "trust": 0.6, "familiarity": 0.65, "lastInteractionAt": "2026-09-11T14:00:00Z", "type": "Acquaintance" },
+        "npc_ruby_student": { "affinity": 0.6, "trust": 0.65, "familiarity": 0.7, "lastInteractionAt": "2026-09-11T16:30:00Z", "type": "Friend" },
+        "npc_dante_oddjobs": { "affinity": 0.5, "trust": 0.55, "familiarity": 0.6, "lastInteractionAt": "2026-09-12T13:30:00Z", "type": "Friend" },
+        "npc_errol_nightauditor": { "affinity": 0.6, "trust": 0.65, "familiarity": 0.7, "lastInteractionAt": "2026-09-12T17:00:00Z", "type": "Friend" }
+      },
+      "memoryStream": [
+        {
+          "timestamp": "2026-09-11T14:00:00Z",
+          "eventType": "work_favor",
+          "description": "Sal fixed his sander free of charge and called it an 'investment.' Theo has been showing up on time since, mostly.",
+          "importanceScore": 0.55,
+          "involvedNpcIds": [ "npc_sal_mechanic" ]
+        },
+        {
+          "timestamp": "2026-09-12T13:30:00Z",
+          "eventType": "gossip",
+          "description": "Dante floated a 'lucrative delivery opportunity.' Theo's honesty trait is the only thing that made him ask what 'lucrative' meant.",
+          "importanceScore": 0.4,
+          "involvedNpcIds": [ "npc_dante_oddjobs" ]
+        }
+      ],
+      "currentTier": "Background",
+      "lastSimulatedAt": "2026-09-12T20:00:00Z",
+      "currentLocationId": "loc_apartment_complex",
+      "currentActivity": "Sleeping"
+    },
+    {
+      "id": "npc_errol_nightauditor",
+      "displayName": "Errol",
+      "age": 39,
+      "appearanceRef": "characters/errol_nightauditor",
+      "personality": {
+        "ambition": 0.4,
+        "extroversion": 0.25,
+        "honesty": 0.8,
+        "riskTolerance": 0.2,
+        "warmth": 0.5,
+        "diligence": 0.2
+      },
+      "needs": { "hunger": 66.0, "energy": 64.0, "social": 50.0, "hygiene": 70.0 },
+      "job": null,
+      "homeLocationId": "loc_apartment_complex",
+      "inventoryItemIds": [ "item_phone", "item_pocket_chess_set", "item_packing_tape" ],
+      "money": 410,
+      "schedule": [
+        { "start": "06:30", "end": "07:15", "activity": "Morning walk — same route, every day", "locationId": "loc_town_square" },
+        { "start": "07:15", "end": "08:00", "activity": "Breakfast", "locationId": "loc_apartment_complex" },
+        { "start": "08:00", "end": "12:00", "activity": "Labels, boxes, cupboards", "locationId": "loc_apartment_complex" },
+        { "start": "12:00", "end": "13:00", "activity": "Lunch", "locationId": "loc_corner_diner" },
+        { "start": "13:00", "end": "17:00", "activity": "Bench — chess with whoever sits down", "locationId": "loc_town_square" },
+        { "start": "17:00", "end": "19:00", "activity": "Workshop hour with Theo", "locationId": "loc_auto_shop" },
+        { "start": "19:00", "end": "22:00", "activity": "Home, radio, bed", "locationId": "loc_apartment_complex" },
+        { "start": "22:00", "end": "06:30", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+      ],
+      "goals": {
+        "shortTerm": [ "Build the shelf he keeps describing to Theo", "Beat Sal at chess exactly once, ever" ],
+        "longTerm": [ "Finish what he starts. Starting with the shelf." ]
+      },
+      "relationships": {
+        "npc_theo_handyman": { "affinity": 0.7, "trust": 0.75, "familiarity": 0.8, "lastInteractionAt": "2026-09-12T17:00:00Z", "type": "Friend" },
+        "npc_sal_mechanic": { "affinity": 0.45, "trust": 0.5, "familiarity": 0.55, "lastInteractionAt": "2026-09-11T16:00:00Z", "type": "Acquaintance" },
+        "npc_greta_retired": { "affinity": 0.55, "trust": 0.6, "familiarity": 0.7, "lastInteractionAt": "2026-09-09T12:00:00Z", "type": "Acquaintance" }
+      },
+      "memoryStream": [
+        {
+          "timestamp": "2026-09-12T17:00:00Z",
+          "eventType": "conversation",
+          "description": "Theo has now offered him a real apprenticeship three times. Errol is still deciding whether deciding counts as progress.",
+          "importanceScore": 0.5,
+          "involvedNpcIds": [ "npc_theo_handyman" ]
+        },
+        {
+          "timestamp": "2026-09-09T12:00:00Z",
+          "eventType": "gossip",
+          "description": "Greta's story about the General Store argument had two different versions nine minutes apart. He noticed.",
+          "importanceScore": 0.35,
+          "involvedNpcIds": [ "npc_greta_retired", "npc_rosa_shop" ]
+        }
+      ],
+      "currentTier": "Background",
+      "lastSimulatedAt": "2026-09-12T20:00:00Z",
+      "currentLocationId": "loc_apartment_complex",
+      "currentActivity": "Sleeping"
+    },
+    {
+      "id": "npc_greta_retired",
+      "displayName": "Greta",
+      "age": 74,
+      "appearanceRef": "characters/greta_retired",
+      "personality": {
+        "ambition": 0.3,
+        "extroversion": 0.7,
+        "honesty": 0.35,
+        "riskTolerance": 0.45,
+        "warmth": 0.4,
+        "diligence": 0.5
+      },
+      "needs": { "hunger": 64.0, "energy": 50.0, "social": 82.0, "hygiene": 76.0 },
+      "job": null,
+      "homeLocationId": "loc_apartment_complex",
+      "inventoryItemIds": [ "item_phone", "item_crossword_book", "item_binoculars" ],
+      "money": 2600,
+      "schedule": [
+        { "start": "07:30", "end": "08:30", "activity": "Breakfast, crossword", "locationId": "loc_apartment_complex" },
+        { "start": "08:30", "end": "11:00", "activity": "Morning bench, everyone-watching", "locationId": "loc_town_square" },
+        { "start": "11:00", "end": "12:00", "activity": "Store run — buys the cheapest thing, stays 40 minutes", "locationId": "loc_general_store" },
+        { "start": "12:00", "end": "14:00", "activity": "Lunch at the Diner counter", "locationId": "loc_corner_diner" },
+        { "start": "14:00", "end": "18:00", "activity": "Afternoon bench, gossip distribution", "locationId": "loc_town_square" },
+        { "start": "18:00", "end": "21:00", "activity": "Dinner, TV", "locationId": "loc_apartment_complex" },
+        { "start": "21:00", "end": "07:30", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+      ],
+      "goals": {
+        "shortTerm": [ "Verify the Rosa–Dante story before distributing it", "Beat the crossword before lunch, once" ],
+        "longTerm": [ "Never be bored for a single day again" ]
+      },
+      "relationships": {
+        "npc_maribel_retired": { "affinity": 0.55, "trust": 0.5, "familiarity": 0.75, "lastInteractionAt": "2026-09-12T15:00:00Z", "type": "Acquaintance" },
+        "npc_lenny_retired": { "affinity": 0.45, "trust": 0.5, "familiarity": 0.7, "lastInteractionAt": "2026-09-12T14:30:00Z", "type": "Friend" },
+        "npc_iris_baker": { "affinity": 0.5, "trust": 0.55, "familiarity": 0.6, "lastInteractionAt": "2026-09-11T12:30:00Z", "type": "Acquaintance" },
+        "npc_errol_nightauditor": { "affinity": 0.55, "trust": 0.6, "familiarity": 0.7, "lastInteractionAt": "2026-09-09T12:00:00Z", "type": "Acquaintance" }
+      },
+      "memoryStream": [
+        {
+          "timestamp": "2026-09-10T15:30:00Z",
+          "eventType": "witnessed_argument",
+          "description": "Saw the Rosa–Dante shouting match from the bench across the street. Two independent sources confirm: she was there.",
+          "importanceScore": 0.75,
+          "involvedNpcIds": [ "npc_rosa_shop", "npc_dante_oddjobs" ]
+        },
+        {
+          "timestamp": "2026-09-12T14:30:00Z",
+          "eventType": "gossip",
+          "description": "Cross-referenced Lenny's version of the noise war with the bench consensus. Both parties are exhausting; both are right.",
+          "importanceScore": 0.35,
+          "involvedNpcIds": [ "npc_lenny_retired", "npc_vik_nightowl" ]
+        }
+      ],
+      "currentTier": "Background",
+      "lastSimulatedAt": "2026-09-12T20:00:00Z",
+      "currentLocationId": "loc_apartment_complex",
+      "currentActivity": "Sleeping"
+    },
+    {
+      "id": "npc_jin_theater",
+      "displayName": "Jin",
+      "age": 29,
+      "appearanceRef": "characters/jin_theater",
+      "personality": {
+        "ambition": 0.8,
+        "extroversion": 0.9,
+        "honesty": 0.65,
+        "riskTolerance": 0.65,
+        "warmth": 0.75,
+        "diligence": 0.6
+      },
+      "needs": { "hunger": 65.0, "energy": 68.0, "social": 90.0, "hygiene": 75.0 },
+      "job": null,
+      "homeLocationId": "loc_apartment_complex",
+      "inventoryItemIds": [ "item_phone", "item_worn_script", "item_instant_noodles" ],
+      "money": 210,
+      "schedule": [
+        { "start": "08:30", "end": "10:00", "activity": "Lines and coffee", "locationId": "loc_apartment_complex" },
+        { "start": "10:00", "end": "13:00", "activity": "Rehearsal space", "locationId": "loc_town_square" },
+        { "start": "13:00", "end": "14:00", "activity": "Lunch", "locationId": "loc_corner_diner" },
+        { "start": "14:00", "end": "18:00", "activity": "Rehearsal / flyer rounds", "locationId": "loc_town_square" },
+        { "start": "18:00", "end": "20:00", "activity": "Evening with Ana", "locationId": "loc_town_square" },
+        { "start": "20:00", "end": "23:30", "activity": "Evening rehearsal / writing", "locationId": "loc_town_square" },
+        { "start": "23:30", "end": "08:30", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+      ],
+      "goals": {
+        "shortTerm": [ "Fill seats for Saturday's one-man show", "Stop eating only Ana's cooking for free" ],
+        "longTerm": [ "A paid theater run — any stage, any city, even this town's park bandshell" ]
+      },
+      "relationships": {
+        "npc_ana_diner": { "affinity": 0.8, "trust": 0.75, "familiarity": 0.85, "lastInteractionAt": "2026-09-12T18:30:00Z", "type": "Romantic" },
+        "npc_dante_oddjobs": { "affinity": 0.45, "trust": 0.5, "familiarity": 0.6, "lastInteractionAt": "2026-09-11T21:00:00Z", "type": "Friend" },
+        "npc_priya_florist": { "affinity": 0.4, "trust": 0.5, "familiarity": 0.5, "lastInteractionAt": "2026-09-10T14:00:00Z", "type": "Acquaintance" }
+      },
+      "memoryStream": [
+        {
+          "timestamp": "2026-09-12T18:30:00Z",
+          "eventType": "romantic_evening",
+          "description": "Walked Ana home; the bad on-purpose play quote landed, which is the entire relationship strategy and it keeps working.",
+          "importanceScore": 0.7,
+          "involvedNpcIds": [ "npc_ana_diner" ]
+        },
+        {
+          "timestamp": "2026-09-11T21:00:00Z",
+          "eventType": "favor_request",
+          "description": "Dante promised to 'personally guarantee' flyer distribution. Jin is 60% sure half will end up in the pond.",
+          "importanceScore": 0.35,
+          "involvedNpcIds": [ "npc_dante_oddjobs" ]
+        }
+      ],
+      "currentTier": "Active",
+      "lastSimulatedAt": "2026-09-12T22:00:00Z",
+      "currentLocationId": "loc_apartment_complex",
+      "currentActivity": "Sleeping"
+    },
+    {
+      "id": "npc_moss_student",
+      "displayName": "Moss",
+      "age": 22,
+      "appearanceRef": "characters/moss_student",
+      "personality": {
+        "ambition": 0.5,
+        "extroversion": 0.2,
+        "honesty": 0.85,
+        "riskTolerance": 0.25,
+        "warmth": 0.6,
+        "diligence": 0.8
+      },
+      "needs": { "hunger": 70.0, "energy": 72.0, "social": 45.0, "hygiene": 68.0 },
+      "job": null,
+      "homeLocationId": "loc_apartment_complex",
+      "inventoryItemIds": [ "item_phone", "item_field_notebook", "item_bird_guide" ],
+      "money": 180,
+      "schedule": [
+        { "start": "06:30", "end": "07:30", "activity": "Morning bird walk", "locationId": "loc_town_square" },
+        { "start": "07:30", "end": "08:30", "activity": "Breakfast", "locationId": "loc_apartment_complex" },
+        { "start": "08:30", "end": "15:00", "activity": "Classes and library hours", "locationId": "loc_town_square" },
+        { "start": "15:00", "end": "16:00", "activity": "Late lunch", "locationId": "loc_corner_diner" },
+        { "start": "16:00", "end": "19:00", "activity": "Thesis notes at the park", "locationId": "loc_town_square" },
+        { "start": "19:00", "end": "22:00", "activity": "Home, reading", "locationId": "loc_apartment_complex" },
+        { "start": "22:00", "end": "06:30", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+      ],
+      "goals": {
+        "shortTerm": [ "Finish the thesis chapter on 'small-town social transmission'", "Photograph the woodpecker before it relocates" ],
+        "longTerm": [ "Get the thesis published, then never speak at a conference" ]
+      },
+      "relationships": {
+        "npc_greta_retired": { "affinity": 0.5, "trust": 0.55, "familiarity": 0.5, "lastInteractionAt": "2026-09-12T09:00:00Z", "type": "Acquaintance" },
+        "npc_jin_theater": { "affinity": 0.35, "trust": 0.45, "familiarity": 0.35, "lastInteractionAt": "2026-09-11T15:30:00Z", "type": "Acquaintance" },
+        "npc_ruby_student": { "affinity": 0.45, "trust": 0.5, "familiarity": 0.4, "lastInteractionAt": "2026-09-10T16:00:00Z", "type": "Acquaintance" }
+      },
+      "memoryStream": [
+        {
+          "timestamp": "2026-09-12T09:00:00Z",
+          "eventType": "interview",
+          "description": "Greta agreed to be interviewed for the thesis, on the condition he 'prints her version.' Under advisement.",
+          "importanceScore": 0.45,
+          "involvedNpcIds": [ "npc_greta_retired" ]
+        },
+        {
+          "timestamp": "2026-09-09T07:00:00Z",
+          "eventType": "field_note",
+          "description": "Logged the woodpecker. Third sighting this week at the same bench; the bench is now part of the study.",
+          "importanceScore": 0.25,
+          "involvedNpcIds": []
+        }
+      ],
+      "currentTier": "Background",
+      "lastSimulatedAt": "2026-09-12T20:00:00Z",
+      "currentLocationId": "loc_apartment_complex",
+      "currentActivity": "Sleeping"
+    },
+    {
+      "id": "npc_nadia_student",
+      "displayName": "Nadia",
+      "age": 20,
+      "appearanceRef": "characters/nadia_student",
+      "personality": {
+        "ambition": 0.9,
+        "extroversion": 0.5,
+        "honesty": 0.7,
+        "riskTolerance": 0.55,
+        "warmth": 0.6,
+        "diligence": 0.9
+      },
+      "needs": { "hunger": 68.0, "energy": 60.0, "social": 58.0, "hygiene": 75.0 },
+      "job": null,
+      "homeLocationId": "loc_apartment_complex",
+      "inventoryItemIds": [ "item_phone", "item_laptop", "item_flashcards" ],
+      "money": 260,
+      "schedule": [
+        { "start": "06:00", "end": "07:00", "activity": "Run", "locationId": "loc_town_square" },
+        { "start": "07:00", "end": "08:00", "activity": "Breakfast, review flashcards", "locationId": "loc_apartment_complex" },
+        { "start": "08:00", "end": "13:00", "activity": "Classes", "locationId": "loc_town_square" },
+        { "start": "13:00", "end": "14:00", "activity": "Lunch", "locationId": "loc_corner_diner" },
+        { "start": "14:00", "end": "18:00", "activity": "Study block", "locationId": "loc_town_square" },
+        { "start": "18:00", "end": "22:00", "activity": "Night classes", "locationId": "loc_town_square" },
+        { "start": "22:00", "end": "06:00", "activity": "Sleep", "locationId": "loc_apartment_complex" }
+      ],
+      "goals": {
+        "shortTerm": [ "Ace the licensing exam on the first try", "Get one Saturday entirely offline" ],
+        "longTerm": [ "Licensed, employed, and out of this town's job market inside two years" ]
+      },
+      "relationships": {
+        "npc_ana_diner": { "affinity": 0.5, "trust": 0.55, "familiarity": 0.55, "lastInteractionAt": "2026-09-12T13:20:00Z", "type": "Acquaintance" },
+        "npc_priya_florist": { "affinity": 0.45, "trust": 0.5, "familiarity": 0.45, "lastInteractionAt": "2026-09-11T17:00:00Z", "type": "Acquaintance" },
+        "npc_ruby_student": { "affinity": 0.55, "trust": 0.6, "familiarity": 0.6, "lastInteractionAt": "2026-09-10T18:00:00Z", "type": "Friend" }
+      },
+      "memoryStream": [
+        {
+          "timestamp": "2026-09-12T13:20:00Z",
+          "eventType": "conversation",
+          "description": "Ana talked her into one evening off a week. Filed under 'probably fine.'",
+          "importanceScore": 0.35,
+          "involvedNpcIds": [ "npc_ana_diner" ]
+        },
+        {
+          "timestamp": "2026-09-08T14:00:00Z",
+          "eventType": "study_session",
+          "description": "Practice exam: 91%. The remaining 9% is now a personal enemy.",
+          "importanceScore": 0.4,
+          "involvedNpcIds": []
+        }
+      ],
+      "currentTier": "Background",
+      "lastSimulatedAt": "2026-09-12T20:00:00Z",
+      "currentLocationId": "loc_apartment_complex",
+      "currentActivity": "Sleeping"
+    }
+  ]
+}

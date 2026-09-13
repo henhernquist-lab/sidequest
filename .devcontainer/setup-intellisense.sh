@@ -9,19 +9,19 @@
 # unresolved here). Full Unity-aware IntelliSense requires opening the
 # project in the actual Editor on the other machine.
 #
+# Newtonsoft.Json is pinned to 13.0.2 because that's the version Unity's
+# com.unity.nuget.newtonsoft-json package (3.2.x) bundles. That package must be
+# added on the Editor machine for the roster loader to compile there.
+#
 # *.csproj is gitignored (standard Unity .gitignore) because Unity
-# regenerates its own on the Editor machine — this file is disposable,
-# regenerated on every container create, and never committed.
+# regenerates its own on the Editor machine — this file is disposable and
+# never committed. It's rewritten on every run so changes here reach
+# existing Codespaces, not just new ones.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 CSPROJ="Assets/Scripts/SideQuest.Scripts.csproj"
 mkdir -p Assets/Scripts
-
-if [ -f "$CSPROJ" ]; then
-  echo "IntelliSense project already exists at $CSPROJ, leaving it alone."
-  exit 0
-fi
 
 cat > "$CSPROJ" <<'EOF'
 <!--
@@ -38,6 +38,9 @@ cat > "$CSPROJ" <<'EOF'
     <Nullable>disable</Nullable>
     <NoWarn>CS0246</NoWarn>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+  </ItemGroup>
 </Project>
 EOF
 
